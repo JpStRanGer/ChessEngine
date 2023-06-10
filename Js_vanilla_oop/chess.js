@@ -15,6 +15,7 @@ class Chessboard {
         this.bordHeight = this.bordWidth;
         this.squareSize = this.bordWidth / this.boardSize;
 
+        this.observers = [];
         this.draw();
     }
 
@@ -75,9 +76,13 @@ class Chessboard {
                 );
             }
         }
+
+        this.notifyObservers();
     }
 
     getSquareName(row, col) {
+        // this.notifyObservers();
+
         if (col < 1 || row < 1) {
             console.log("out of range");
             return null;
@@ -93,6 +98,24 @@ class Chessboard {
         );
         return this.boardIndex.horizontal[col - 1] + this.boardIndex.vertical[8 - row];
     }
+
+    
+    addObserver(observer) {
+        this.observers.push(observer);
+    }
+
+    removeObserver(observer) {
+        const index = this.observers.indexOf(observer);
+        if (index !== -1) {
+            this.observers.splice(index, 1);
+        }
+    }
+
+    notifyObservers() {
+        for (const observer of this.observers) {
+            observer.update();
+        }
+    }
 }
 
 class Debugger {
@@ -100,9 +123,17 @@ class Debugger {
         this._chessboard = chessboard;
         this.showDebugger = true;
         if (this.showDebugger) {
+            this._chessboard.addObserver(this); // adding debugger as observer to chessboard.
             canvas.addEventListener("mousemove", this.mouseTracker.bind(this));
             // this.drawOnDisplay();
         }
+    }
+
+    // Update when notifyid from subject (the observed object)
+    update() {
+        console.log("debuger notifide!!")
+        // this._debugData = this.getDebugData();
+        // this.drawOnDisplay(this._debugdata);
     }
 
     drawOnDisplay(debugData) {
@@ -136,27 +167,31 @@ class Debugger {
         }
     }
 
-    mouseTracker(event) {
+    getDebugData() {
         let boxPosition = canvas.getBoundingClientRect();
-        let boxX = event.clientX - boxPosition.left;
-        let boxY = event.clientY - boxPosition.top;
+        let boxX = this._mouseX - boxPosition.left;
+        let boxY = this._mouseY - boxPosition.top;
         let squareSize = this._chessboard.squareSize;
         let row = Math.floor(boxY / squareSize);
         let col = Math.floor(boxX / squareSize);
         let squareName = this._chessboard.getSquareName(row, col);
-        let debugData = [
-            // `Font ${context.font}`,
+
+        return [
             `canvas.width ${canvas.width}`,
             `canvas.height ${canvas.height}`,
             `boxPosition.left: ${boxPosition.left}`,
             `boxPosition.top: ${boxPosition.top}`,
-            `event.clientX: ${event.clientX}`,
-            `event.clientY: ${event.clientY}`,
-            `boxX: ${event.clientX - boxPosition.left}`,
-            `boxY: ${event.clientY - boxPosition.top}`,
+            `boxX: ${boxX}`,
+            `boxY: ${boxY}`,
             `Square: ${squareName}`,
         ];
-        this.drawOnDisplay(debugData);
+    }
+    mouseTracker(event) {
+        this._mouseX = event.clientX;
+        this._mouseY = event.clientY;
+        this._debugData = this.getDebugData();
+        // console.log(this.getDebugData());
+        this.drawOnDisplay(this._debugData);
     }
 }
 

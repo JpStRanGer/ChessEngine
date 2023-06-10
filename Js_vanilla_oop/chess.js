@@ -1,6 +1,12 @@
 let canvas = document.getElementById("chessboard");
 let context = canvas.getContext("2d");
 
+class ChessPiece {
+    constructor() {}
+
+    drawPieseOnBoard() {}
+}
+
 class Chessboard {
     constructor() {
         console.log("constructed obj Chessboard");
@@ -16,6 +22,8 @@ class Chessboard {
         this.squareSize = this.bordWidth / this.boardSize;
 
         this.observers = [];
+        
+        
         this.draw();
     }
 
@@ -94,12 +102,15 @@ class Chessboard {
         console.log(
             row - 1,
             col - 1,
-            this.boardIndex.horizontal[col - 1] + this.boardIndex.vertical[8-row]
+            this.boardIndex.horizontal[col - 1] +
+                this.boardIndex.vertical[8 - row]
         );
-        return this.boardIndex.horizontal[col - 1] + this.boardIndex.vertical[8 - row];
+        return (
+            this.boardIndex.horizontal[col - 1] +
+            this.boardIndex.vertical[8 - row]
+        );
     }
 
-    
     addObserver(observer) {
         this.observers.push(observer);
     }
@@ -131,7 +142,7 @@ class Debugger {
 
     // Update when notifyid from subject (the observed object)
     update() {
-        console.log("debuger notifide!!")
+        console.log("debuger notifide!!");
         // this._debugData = this.getDebugData();
         // this.drawOnDisplay(this._debugdata);
     }
@@ -175,6 +186,7 @@ class Debugger {
         let row = Math.floor(boxY / squareSize);
         let col = Math.floor(boxX / squareSize);
         let squareName = this._chessboard.getSquareName(row, col);
+        let observers = this._chessboard.observers;
 
         return [
             `canvas.width ${canvas.width}`,
@@ -184,6 +196,7 @@ class Debugger {
             `boxX: ${boxX}`,
             `boxY: ${boxY}`,
             `Square: ${squareName}`,
+            `observers: ${observers.length}`,
         ];
     }
     mouseTracker(event) {

@@ -31,23 +31,39 @@ class ChessPieceFactory {
 }
 
 class ChessPiece {
-    constructor(color, row, col, board) {
+    _board = undefined;
+    _color = 'white';
+    _name = "";
+
+    position = {
+        current: {row: undefined, col: undefined },
+        old: { col: undefined, row: undefined },
+    };
+
+    atPosition(row, col) {
+        this.setBoardPosition(row, col);
+
+        return this;
+    }
+
+    asBlack() {
+        this._color = 'black';
+
+        return this;
+    }
+
+    withBoard(board) {
         this._board = board;
-        this._position = this.setBoardPosition(row, col);
-        this._color = color;
-        this._name = "";
+
+        return this;
     }
 
     setBoardPosition(row, col) {
-        const frameSize = this._board.frameSize;
-        const squareSize = this._board.squareSize;
-        return {
-            current: {
-                col: frameSize + col * squareSize + squareSize / 2,
-                row: frameSize + row * squareSize + squareSize / 2,
-            },
-            old: { col: col, row: row },
-        };
+        this.position.old.row = typeof this.position.old.row === 'undefined' ? row : this.position.current.row;
+        this.position.old.col = typeof this.position.old.col === 'undefined' ? row : this.position.current.col;
+
+        this.position.current.row = row;
+        this.position.current.col = col;
     }
 
     setPiecePosition_string(newPosition) {
@@ -64,11 +80,24 @@ class ChessPiece {
     draw() {
         context.fillStyle = "red";
         context.font = "BOLD 100px";
+
+        let {x, y} = this.getPosition();
+
         context.fillText(
             this._name,
-            this._position.current.col,
-            this._position.current.row
+            x,
+            y
         );
+    }
+
+    getPosition() {
+        const frameSize = this._board.frameSize;
+        const squareSize = this._board.squareSize;
+
+        return {
+            x: frameSize + this.position.current.col * squareSize + squareSize / 2,
+            y: frameSize + this.position.current.row * squareSize + squareSize / 2,
+        }
     }
 }
 
@@ -129,79 +158,29 @@ class Chessboard {
         this.draw();
     }
 
+    addPieces(pieces) {
+        this.pieces.push(...pieces.map(piece => {
+            return piece.withBoard(this);
+        }))
+
+        return this;
+    }
+
     init() {
-        this.pieces.push(
-            ChessPieceFactory.createPiece(
-                "rook",
-                "black",
-                0,
-                0,
-                this
-            )
-        );
-        this.pieces.push(
-            ChessPieceFactory.createPiece(
-                "knight",
-                "black",
-                0,
-                1,
-                this
-            )
-        );
-        this.pieces.push(
-            ChessPieceFactory.createPiece(
-                "bishop",
-                "black",
-                0,
-                2,
-                this
-            )
-        );
-        this.pieces.push(
-            ChessPieceFactory.createPiece(
-                "queen",
-                "black",
-                0,
-                3,
-                this
-            )
-        );
-        this.pieces.push(
-            ChessPieceFactory.createPiece(
-                "king",
-                "black",
-                0,
-                4,
-                this
-            )
-        );
-        this.pieces.push(
-            ChessPieceFactory.createPiece(
-                "bishop",
-                "black",
-                0,
-                5,
-                this
-            )
-        );
-        this.pieces.push(
-            ChessPieceFactory.createPiece(
-                "king",
-                "white",
-                7,
-                4,
-                this
-            )
-        );
-        this.pieces.push(
-            ChessPieceFactory.createPiece(
-                "bishop",
-                "white",
-                5,
-                4,
-                this
-            )
-        );
+        let blackPieces = [
+            new Rook,
+            new Knight,
+            new Bishop,
+            new Queen,
+            new King,
+            new Bishop,
+            new Knight,
+            new Rook,
+        ].map((piece, index) => {
+            return piece.atPosition(0, index).asBlack();
+        });
+
+        this.addPieces(blackPieces);
     }
 
     draw() {

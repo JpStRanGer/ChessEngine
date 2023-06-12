@@ -35,7 +35,7 @@ class ChessPiece {
         this._board = board;
         this._position = this.setBoardPosition(row, col);
         this._color = color;
-        this._type = "";
+        this._name = "";
     }
 
     setBoardPosition(row, col) {
@@ -65,7 +65,7 @@ class ChessPiece {
         context.fillStyle = "red";
         context.font = "BOLD 100px";
         context.fillText(
-            this._type,
+            this._name,
             this._position.current.col,
             this._position.current.row
         );
@@ -73,44 +73,26 @@ class ChessPiece {
 }
 
 class Rook extends ChessPiece {
-    constructor(color, row, col, board) {
-        super(color, row, col, board);
-        this._type = "Rook";
-    }
+    _name = "Rook";
 }
 
 class Knight extends ChessPiece {
-    constructor(color, row, col, board) {
-        super(color, row, col, board);
-        this._type = "Knight";
-    }
+    _name = "Knight";
 }
 
 class Bishop extends ChessPiece {
-    constructor(color, row, col, board) {
-        super(color, row, col, board);
-        this._type = "Bishop";
-    }
+    _name = "Bishop";
 }
 
 class Queen extends ChessPiece {
-    constructor(color, row, col, board) {
-        super(color, row, col, board);
-        this._type = "Queen";
-    }
+    _name = "Queen";
 }
 
 class King extends ChessPiece {
-    constructor(color, row, col, board) {
-        super(color, row, col, board);
-        this._type = "King";
-    }
+    _name = "King";
 }
 class Pawn extends ChessPiece {
-    constructor(color, row, col, board) {
-        super(color, row, col, board);
-        this._type = "Pawn";
-    }
+    _name = "Pawn";
 }
 
 class boardSquare {

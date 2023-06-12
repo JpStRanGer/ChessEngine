@@ -1,35 +1,6 @@
 let canvas = document.getElementById("chessboard");
 let context = canvas.getContext("2d");
 
-// Chess Piece Factory
-class ChessPieceFactory {
-    /**
-     * Creates a chess piece based on the provided type, color, row, and column.
-     * @param {string} type - The type of the chess piece (e.g., "rook", "knight").
-     * @param {string} color - The color of the chess piece ("black" or "white").
-     * @param {number} row - The row of the chess piece on the chessboard.
-     * @param {number} col - The column of the chess piece on the chessboard.
-     * @returns {ChessPiece} - The created chess piece.
-     */
-    static createPiece(type, color, row, col, board) {
-        switch (type) {
-            case "rook":
-                return new Rook(color, row, col, board);
-            case "knight":
-                return new Knight(color, row, col, board);
-            case "bishop":
-                return new Bishop(color, row, col, board);
-            case "queen":
-                return new Queen(color, row, col, board);
-            case "king":
-                return new King(color, row, col, board);
-            case "pawn":
-                return new Pawn(color, row, col, board);
-        }
-        // Add more piece types as needed
-    }
-}
-
 class ChessPiece {
     _board = undefined;
     _color = 'white';

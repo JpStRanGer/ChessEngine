@@ -15,8 +15,16 @@ class ChessPieceFactory {
         switch (type) {
             case "rook":
                 return new Rook(color, row, col, boardSettings);
+            case "knight":
+                return new Knight(color, row, col, boardSettings);
+            case "bishop":
+                return new Bishop(color, row, col, boardSettings);
+            case "queen":
+                return new Queen(color, row, col, boardSettings);
             case "king":
                 return new King(color, row, col, boardSettings);
+            case "pawn":
+                return new Pawn(color, row, col, boardSettings);
         }
         // Add more piece types as needed
     }
@@ -34,7 +42,10 @@ class ChessPiece {
         const frameSize = this._boardSettings.frameSize;
         const squareSize = this._boardSettings.squareSize;
         return {
-            current: { col: frameSize + col * squareSize + squareSize/2, row: frameSize + row * squareSize + squareSize/2 },
+            current: {
+                col: frameSize + col * squareSize + squareSize / 2,
+                row: frameSize + row * squareSize + squareSize / 2,
+            },
             old: { col: col, row: row },
         };
     }
@@ -64,14 +75,41 @@ class ChessPiece {
 class Rook extends ChessPiece {
     constructor(color, row, col, boardSettings) {
         super(color, row, col, boardSettings);
-        this._type = "rook";
+        this._type = "Rook";
+    }
+}
+
+class Knight extends ChessPiece {
+    constructor(color, row, col, boardSettings) {
+        super(color, row, col, boardSettings);
+        this._type = "Knight";
+    }
+}
+
+class Bishop extends ChessPiece {
+    constructor(color, row, col, boardSettings) {
+        super(color, row, col, boardSettings);
+        this._type = "Bishop";
+    }
+}
+
+class Queen extends ChessPiece {
+    constructor(color, row, col, boardSettings) {
+        super(color, row, col, boardSettings);
+        this._type = "Queen";
     }
 }
 
 class King extends ChessPiece {
     constructor(color, row, col, boardSettings) {
         super(color, row, col, boardSettings);
-        this._type = "king";
+        this._type = "King";
+    }
+}
+class Pawn extends ChessPiece {
+    constructor(color, row, col, boardSettings) {
+        super(color, row, col, boardSettings);
+        this._type = "Pawn";
     }
 }
 
@@ -134,6 +172,33 @@ class Chessboard {
         );
         this.pieces.push(
             ChessPieceFactory.createPiece(
+                "knight",
+                "black",
+                0,
+                1,
+                this.boardSettings
+            )
+        );
+        this.pieces.push(
+            ChessPieceFactory.createPiece(
+                "bishop",
+                "black",
+                0,
+                2,
+                this.boardSettings
+            )
+        );
+        this.pieces.push(
+            ChessPieceFactory.createPiece(
+                "queen",
+                "black",
+                0,
+                3,
+                this.boardSettings
+            )
+        );
+        this.pieces.push(
+            ChessPieceFactory.createPiece(
                 "king",
                 "black",
                 0,
@@ -143,9 +208,27 @@ class Chessboard {
         );
         this.pieces.push(
             ChessPieceFactory.createPiece(
+                "bishop",
+                "black",
+                0,
+                5,
+                this.boardSettings
+            )
+        );
+        this.pieces.push(
+            ChessPieceFactory.createPiece(
                 "king",
                 "white",
                 7,
+                4,
+                this.boardSettings
+            )
+        );
+        this.pieces.push(
+            ChessPieceFactory.createPiece(
+                "bishop",
+                "white",
+                5,
                 4,
                 this.boardSettings
             )

@@ -128,9 +128,9 @@ class BoardSettings {
     constructor() {
         this.frameSize = 90;
         this.boardSize = 8;
-        this.bordWidth = canvas.width - this.frameSize * 2;
-        this.bordHeight = this.bordWidth;
-        this.squareSize = this.bordWidth / this.boardSize;
+        this.boardWidth = canvas.width - this.frameSize * 2;
+        this.boardHeight = this.boardWidth;
+        this.squareSize = this.boardWidth / this.boardSize;
         this.boardIndex = {
             horizontal: ["A", "B", "C", "D", "E", "F", "H", "G"],
             vertical: ["1", "2", "3", "4", "5", "6", "7", "8"],
@@ -148,8 +148,8 @@ class Chessboard {
         this.boardIndex = this.boardSettings.boardIndex;
         this.frameSize = this.boardSettings.frameSize;
         this.boardSize = this.boardSettings.boardSize;
-        this.bordWidth = this.boardSettings.bordWidth;
-        this.bordHeight = this.boardSettings.bordHeight;
+        this.boardWidth = this.boardSettings.boardWidth;
+        this.boardHeight = this.boardSettings.boardHeight;
         this.squareSize = this.boardSettings.squareSize;
 
         this.observers = [];
@@ -264,7 +264,7 @@ class Chessboard {
             context.fillText(
                 boardIndex.horizontal[i],
                 collomnPos + i * squareSize,
-                frameSize + this.bordHeight + textOfset
+                frameSize + this.boardHeight + textOfset
             );
             context.fillText(
                 8 - i,
@@ -273,7 +273,7 @@ class Chessboard {
             );
             context.fillText(
                 boardIndex.vertical[7 - i],
-                frameSize + this.bordHeight + textOfset,
+                frameSize + this.boardHeight + textOfset,
                 collomnPos + i * squareSize
             );
         }

@@ -91,13 +91,7 @@ class ChessPiece {
     }
 
     getPosition() {
-        const frameSize = this._board.frameSize;
-        const squareSize = this._board.squareSize;
-
-        return {
-            x: frameSize + this.position.current.col * squareSize + squareSize / 2,
-            y: frameSize + this.position.current.row * squareSize + squareSize / 2,
-        }
+        return this._board.getPosition(this.position.current.col, this.position.current.row)
     }
 }
 
@@ -191,6 +185,18 @@ class Chessboard {
             this.boardIndex
         );
         this.drawPieces();
+    }
+
+    getPosition(col, row) {
+        const frameSize = this.frameSize;
+        const squareSize = this.squareSize;
+
+        const max = squareSize * this.boardSize;
+
+        return {
+            x: frameSize + col * squareSize + squareSize / 2,
+            y: frameSize + row * squareSize + squareSize / 2,
+        }
     }
 
     drawChessboard(boardSize, squareSize, frameSize, boardIndex) {

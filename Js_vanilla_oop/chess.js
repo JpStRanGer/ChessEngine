@@ -178,12 +178,7 @@ class Chessboard {
     }
 
     draw() {
-        this.drawChessboard(
-            this.boardSize,
-            this.squareSize,
-            this.frameSize,
-            this.boardIndex
-        );
+        this.drawChessboard();
         this.drawPieces();
     }
 
@@ -199,50 +194,50 @@ class Chessboard {
         }
     }
 
-    drawChessboard(boardSize, squareSize, frameSize, boardIndex) {
+    drawChessboard() {
         // Draw frame
         let textOfset = 33;
 
-        let collomnPos = frameSize + squareSize / 2;
+        let collomnPos = this.frameSize + this.squareSize / 2;
         let textColor = "black";
-        for (var i = 0; i < boardSize; i++) {
+        for (var i = 0; i < this.boardSize; i++) {
             context.font = "bold 30px serif";
             context.textAlign = "center";
             context.textBaseline = "middle";
             context.fillStyle = textColor;
             context.fillText(
-                boardIndex.horizontal[i],
-                collomnPos + i * squareSize,
-                frameSize - textOfset
+                this.boardIndex.horizontal[i],
+                collomnPos + i * this.squareSize,
+                this.frameSize - textOfset
             );
             context.fillText(
-                boardIndex.horizontal[i],
-                collomnPos + i * squareSize,
-                frameSize + this.boardHeight + textOfset
+                this.boardIndex.horizontal[i],
+                collomnPos + i * this.squareSize,
+                this.frameSize + this.boardHeight + textOfset
             );
             context.fillText(
                 8 - i,
-                frameSize - textOfset,
-                collomnPos + i * squareSize
+                this.frameSize - textOfset,
+                collomnPos + i * this.squareSize
             );
             context.fillText(
-                boardIndex.vertical[7 - i],
-                frameSize + this.boardHeight + textOfset,
-                collomnPos + i * squareSize
+                this.boardIndex.vertical[7 - i],
+                this.frameSize + this.boardHeight + textOfset,
+                collomnPos + i * this.squareSize
             );
         }
         // Draw board
-        for (var row = 0; row < boardSize; row++) {
-            for (var col = 0; col < boardSize; col++) {
+        for (var row = 0; row < this.boardSize; row++) {
+            for (var col = 0; col < this.boardSize; col++) {
                 context.fillStyle =
                     (row + col) % 2 === 0
                         ? this.squareColor[0]
                         : this.squareColor[1];
                 context.fillRect(
-                    frameSize + row * squareSize,
-                    frameSize + col * squareSize,
-                    squareSize,
-                    squareSize
+                    this.frameSize + row * this.squareSize,
+                    this.frameSize + col * this.squareSize,
+                    this.squareSize,
+                    this.squareSize
                 );
             }
         }

@@ -26,24 +26,37 @@ class ChessPiece {
     constructor(color, row, col) {
         this._Position = {
             current: { col: col, row: row },
+            old: { col: col, row: row },
         };
         this._color = color;
         this._type = "";
-        this.draw();
+    }
+
+    setPiecePosition_string(newPosition) {
+        const col = newPosition.charAt(0).toUpperCase();
+        const row = parseInt(newPosition.charAt(1));
+
+        if (isNaN(row) || row < 1 || row > 8 || column < "A" || column > "H") {
+            throw new Error("Invalid chess square");
+        }
+
+        return {col:col, row:row};
     }
 
     draw() {
-        console.log(`Drawing ${this.type}`);
         context.fillStyle = "red";
-        context.font = "BOLD 50px";
-        context.fillText("PIECE", 50, 50);
+        context.font = "BOLD 100px";
+        context.fillText(
+            this._type,
+            this._Position.current.col,
+            this._Position.current.row
+        );
     }
 }
 
 class Rook extends ChessPiece {
     constructor(color, row, col) {
-        // super(color, row, col);
-        super();
+        super(color, row, col);
         this._type = "rook";
     }
 }
@@ -55,14 +68,27 @@ class King extends ChessPiece {
     }
 }
 
+class boardSquare {
+    constructor(color, row, col){
+        this._color = color;
+        this._row = row;
+        this._col = col;
+        this._rowPos = NaN;
+        this._colPos = NaN;
+        this._name = "";
+    }
+}
+
 class Chessboard {
     constructor() {
-        console.log("constructed obj Chessboard");
+
+        canvas.addEventListener("mousemove", this.mouseTracker.bind(this));
+
+
         this.frameSize = 90;
         this.boardSize = 8;
         this.squareColor = ["#7a8285", "#222"];
         this.boardIndex = {
-            // horizontal: ["a", "b", "c", "d", "e", "f", "h", "g"],
             horizontal: ["A", "B", "C", "D", "E", "F", "H", "G"],
             vertical: ["1", "2", "3", "4", "5", "6", "7", "8"],
         };
@@ -72,19 +98,18 @@ class Chessboard {
 
         this.observers = [];
         this.pieces = [];
+        this.squars = [];
         this.init();
         this.draw();
     }
 
     init() {
         this.pieces.push(ChessPieceFactory.createPiece("rook", "black", 1, 5));
-        this.pieces.push(ChessPieceFactory.createPiece("king", "black", 1, 5));
-        this.pieces.push(ChessPieceFactory.createPiece("king", "white", 1, 5));
+        // this.pieces.push(ChessPieceFactory.createPiece("king", "black", 1, 5));
+        // this.pieces.push(ChessPieceFactory.createPiece("king", "white", 1, 5));
     }
 
     draw() {
-        console.log("draw Chessboard");
-
         this.drawChessboard(
             this.boardSize,
             this.squareSize,
@@ -142,7 +167,6 @@ class Chessboard {
             }
         }
 
-        this.notifyObservers();
     }
 
     drawPieces() {
@@ -151,9 +175,9 @@ class Chessboard {
         for (const piece in this.pieces) {
             this.pieces[piece].draw();
         }
-        // 
+        //
         // or
-        // 
+        //
         // for (const piece of this.pieces) {
         //     piece.draw();
         // }
@@ -198,6 +222,16 @@ class Chessboard {
             observer.update();
         }
     }
+
+    mouseTracker(event) {
+        this._mouseX = event.clientX;
+        this._mouseY = event.clientY;
+        // this._debugData = this.getDebugData();
+        // console.log(this.getDebugData());
+        // this.drawOnDisplay(this._debugData);
+        this.notifyObservers();
+
+    }
 }
 
 class Debugger {
@@ -206,16 +240,15 @@ class Debugger {
         this.showDebugger = true;
         if (this.showDebugger) {
             this._chessboard.addObserver(this); // adding debugger as observer to chessboard.
-            canvas.addEventListener("mousemove", this.mouseTracker.bind(this));
             // this.drawOnDisplay();
         }
     }
 
     // Update when notifyid from subject (the observed object)
     update() {
-        console.log("debuger notifide!!");
-        // this._debugData = this.getDebugData();
-        // this.drawOnDisplay(this._debugdata);
+        // console.log("debuger notifide!!");
+        const debugData = this.getDebugData();
+        this.drawOnDisplay(debugData);
     }
 
     drawOnDisplay(debugData) {
@@ -251,8 +284,8 @@ class Debugger {
 
     getDebugData() {
         let boxPosition = canvas.getBoundingClientRect();
-        let boxX = this._mouseX - boxPosition.left;
-        let boxY = this._mouseY - boxPosition.top;
+        let boxX = this._chessboard._mouseX - boxPosition.left;
+        let boxY = this._chessboard._mouseY - boxPosition.top;
         let squareSize = this._chessboard.squareSize;
         let row = Math.floor(boxY / squareSize);
         let col = Math.floor(boxX / squareSize);
@@ -264,19 +297,15 @@ class Debugger {
             `canvas.height ${canvas.height}`,
             `boxPosition.left: ${boxPosition.left}`,
             `boxPosition.top: ${boxPosition.top}`,
+            `clientX: ${this._mouseX}`,
+            `clientY: ${this._mouseY}`,
             `boxX: ${boxX}`,
             `boxY: ${boxY}`,
             `Square: ${squareName}`,
             `observers: ${observers.length}`,
         ];
     }
-    mouseTracker(event) {
-        this._mouseX = event.clientX;
-        this._mouseY = event.clientY;
-        this._debugData = this.getDebugData();
-        // console.log(this.getDebugData());
-        this.drawOnDisplay(this._debugData);
-    }
+
 }
 
 const chessboardw = new Chessboard();

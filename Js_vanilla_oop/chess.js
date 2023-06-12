@@ -11,36 +11,36 @@ class ChessPieceFactory {
      * @param {number} col - The column of the chess piece on the chessboard.
      * @returns {ChessPiece} - The created chess piece.
      */
-    static createPiece(type, color, row, col, boardSettings) {
+    static createPiece(type, color, row, col, board) {
         switch (type) {
             case "rook":
-                return new Rook(color, row, col, boardSettings);
+                return new Rook(color, row, col, board);
             case "knight":
-                return new Knight(color, row, col, boardSettings);
+                return new Knight(color, row, col, board);
             case "bishop":
-                return new Bishop(color, row, col, boardSettings);
+                return new Bishop(color, row, col, board);
             case "queen":
-                return new Queen(color, row, col, boardSettings);
+                return new Queen(color, row, col, board);
             case "king":
-                return new King(color, row, col, boardSettings);
+                return new King(color, row, col, board);
             case "pawn":
-                return new Pawn(color, row, col, boardSettings);
+                return new Pawn(color, row, col, board);
         }
         // Add more piece types as needed
     }
 }
 
 class ChessPiece {
-    constructor(color, row, col, boardSettings) {
-        this._boardSettings = boardSettings;
+    constructor(color, row, col, board) {
+        this._board = board;
         this._position = this.setBoardPosition(row, col);
         this._color = color;
         this._type = "";
     }
 
     setBoardPosition(row, col) {
-        const frameSize = this._boardSettings.frameSize;
-        const squareSize = this._boardSettings.squareSize;
+        const frameSize = this._board.frameSize;
+        const squareSize = this._board.squareSize;
         return {
             current: {
                 col: frameSize + col * squareSize + squareSize / 2,
@@ -73,42 +73,42 @@ class ChessPiece {
 }
 
 class Rook extends ChessPiece {
-    constructor(color, row, col, boardSettings) {
-        super(color, row, col, boardSettings);
+    constructor(color, row, col, board) {
+        super(color, row, col, board);
         this._type = "Rook";
     }
 }
 
 class Knight extends ChessPiece {
-    constructor(color, row, col, boardSettings) {
-        super(color, row, col, boardSettings);
+    constructor(color, row, col, board) {
+        super(color, row, col, board);
         this._type = "Knight";
     }
 }
 
 class Bishop extends ChessPiece {
-    constructor(color, row, col, boardSettings) {
-        super(color, row, col, boardSettings);
+    constructor(color, row, col, board) {
+        super(color, row, col, board);
         this._type = "Bishop";
     }
 }
 
 class Queen extends ChessPiece {
-    constructor(color, row, col, boardSettings) {
-        super(color, row, col, boardSettings);
+    constructor(color, row, col, board) {
+        super(color, row, col, board);
         this._type = "Queen";
     }
 }
 
 class King extends ChessPiece {
-    constructor(color, row, col, boardSettings) {
-        super(color, row, col, boardSettings);
+    constructor(color, row, col, board) {
+        super(color, row, col, board);
         this._type = "King";
     }
 }
 class Pawn extends ChessPiece {
-    constructor(color, row, col, boardSettings) {
-        super(color, row, col, boardSettings);
+    constructor(color, row, col, board) {
+        super(color, row, col, board);
         this._type = "Pawn";
     }
 }
@@ -124,8 +124,10 @@ class boardSquare {
     }
 }
 
-class BoardSettings {
+class Chessboard {
     constructor() {
+        canvas.addEventListener("mousemove", this.mouseTracker.bind(this));
+
         this.frameSize = 90;
         this.boardSize = 8;
         this.boardWidth = canvas.width - this.frameSize * 2;
@@ -136,21 +138,6 @@ class BoardSettings {
             vertical: ["1", "2", "3", "4", "5", "6", "7", "8"],
         };
         this.squareColor = ["#7a8285", "#222"];
-    }
-}
-
-class Chessboard {
-    constructor() {
-        canvas.addEventListener("mousemove", this.mouseTracker.bind(this));
-
-        this.boardSettings = new BoardSettings();
-        this.squareColor = this.boardSettings.squareColor;
-        this.boardIndex = this.boardSettings.boardIndex;
-        this.frameSize = this.boardSettings.frameSize;
-        this.boardSize = this.boardSettings.boardSize;
-        this.boardWidth = this.boardSettings.boardWidth;
-        this.boardHeight = this.boardSettings.boardHeight;
-        this.squareSize = this.boardSettings.squareSize;
 
         this.observers = [];
         this.pieces = [];
@@ -167,7 +154,7 @@ class Chessboard {
                 "black",
                 0,
                 0,
-                this.boardSettings
+                this
             )
         );
         this.pieces.push(
@@ -176,7 +163,7 @@ class Chessboard {
                 "black",
                 0,
                 1,
-                this.boardSettings
+                this
             )
         );
         this.pieces.push(
@@ -185,7 +172,7 @@ class Chessboard {
                 "black",
                 0,
                 2,
-                this.boardSettings
+                this
             )
         );
         this.pieces.push(
@@ -194,7 +181,7 @@ class Chessboard {
                 "black",
                 0,
                 3,
-                this.boardSettings
+                this
             )
         );
         this.pieces.push(
@@ -203,7 +190,7 @@ class Chessboard {
                 "black",
                 0,
                 4,
-                this.boardSettings
+                this
             )
         );
         this.pieces.push(
@@ -212,7 +199,7 @@ class Chessboard {
                 "black",
                 0,
                 5,
-                this.boardSettings
+                this
             )
         );
         this.pieces.push(
@@ -221,7 +208,7 @@ class Chessboard {
                 "white",
                 7,
                 4,
-                this.boardSettings
+                this
             )
         );
         this.pieces.push(
@@ -230,7 +217,7 @@ class Chessboard {
                 "white",
                 5,
                 4,
-                this.boardSettings
+                this
             )
         );
     }

@@ -191,11 +191,11 @@ class Chessboard {
         const frameSize = this.frameSize;
         const squareSize = this.squareSize;
 
-        const max = squareSize * this.boardSize;
+        const boardSize = squareSize * this.boardSize;
 
         return {
             x: frameSize + col * squareSize + squareSize / 2,
-            y: frameSize + row * squareSize + squareSize / 2,
+            y: frameSize + boardSize - (row * squareSize + squareSize / 2),
         }
     }
 

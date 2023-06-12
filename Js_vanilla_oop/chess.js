@@ -11,25 +11,32 @@ class ChessPieceFactory {
      * @param {number} col - The column of the chess piece on the chessboard.
      * @returns {ChessPiece} - The created chess piece.
      */
-    static createPiece(type, color, row, col) {
+    static createPiece(type, color, row, col, boardSettings) {
         switch (type) {
             case "rook":
-                return new Rook(color, row, col);
+                return new Rook(color, row, col, boardSettings);
             case "king":
-                return new King(color, row, col);
+                return new King(color, row, col, boardSettings);
         }
         // Add more piece types as needed
     }
 }
 
 class ChessPiece {
-    constructor(color, row, col) {
-        this._Position = {
-            current: { col: col, row: row },
-            old: { col: col, row: row },
-        };
+    constructor(color, row, col, boardSettings) {
+        this._boardSettings = boardSettings;
+        this._position = this.setBoardPosition(row, col);
         this._color = color;
         this._type = "";
+    }
+
+    setBoardPosition(row, col) {
+        const frameSize = this._boardSettings.frameSize;
+        const squareSize = this._boardSettings.squareSize;
+        return {
+            current: { col: frameSize + col * squareSize + squareSize/2, row: frameSize + row * squareSize + squareSize/2 },
+            old: { col: col, row: row },
+        };
     }
 
     setPiecePosition_string(newPosition) {
@@ -40,7 +47,7 @@ class ChessPiece {
             throw new Error("Invalid chess square");
         }
 
-        return {col:col, row:row};
+        return { col: col, row: row };
     }
 
     draw() {
@@ -48,28 +55,28 @@ class ChessPiece {
         context.font = "BOLD 100px";
         context.fillText(
             this._type,
-            this._Position.current.col,
-            this._Position.current.row
+            this._position.current.col,
+            this._position.current.row
         );
     }
 }
 
 class Rook extends ChessPiece {
-    constructor(color, row, col) {
-        super(color, row, col);
+    constructor(color, row, col, boardSettings) {
+        super(color, row, col, boardSettings);
         this._type = "rook";
     }
 }
 
 class King extends ChessPiece {
-    constructor(color, row, col) {
-        super(color, row, col);
+    constructor(color, row, col, boardSettings) {
+        super(color, row, col, boardSettings);
         this._type = "king";
     }
 }
 
 class boardSquare {
-    constructor(color, row, col){
+    constructor(color, row, col) {
         this._color = color;
         this._row = row;
         this._col = col;
@@ -79,34 +86,70 @@ class boardSquare {
     }
 }
 
-class Chessboard {
+class BoardSettings {
     constructor() {
-
-        canvas.addEventListener("mousemove", this.mouseTracker.bind(this));
-
-
         this.frameSize = 90;
         this.boardSize = 8;
-        this.squareColor = ["#7a8285", "#222"];
+        this.bordWidth = canvas.width - this.frameSize * 2;
+        this.bordHeight = this.bordWidth;
+        this.squareSize = this.bordWidth / this.boardSize;
         this.boardIndex = {
             horizontal: ["A", "B", "C", "D", "E", "F", "H", "G"],
             vertical: ["1", "2", "3", "4", "5", "6", "7", "8"],
         };
-        this.bordWidth = canvas.width - this.frameSize * 2;
-        this.bordHeight = this.bordWidth;
-        this.squareSize = this.bordWidth / this.boardSize;
+        this.squareColor = ["#7a8285", "#222"];
+    }
+}
+
+class Chessboard {
+    constructor() {
+        canvas.addEventListener("mousemove", this.mouseTracker.bind(this));
+
+        this.boardSettings = new BoardSettings();
+        this.squareColor = this.boardSettings.squareColor;
+        this.boardIndex = this.boardSettings.boardIndex;
+        this.frameSize = this.boardSettings.frameSize;
+        this.boardSize = this.boardSettings.boardSize;
+        this.bordWidth = this.boardSettings.bordWidth;
+        this.bordHeight = this.boardSettings.bordHeight;
+        this.squareSize = this.boardSettings.squareSize;
 
         this.observers = [];
         this.pieces = [];
         this.squars = [];
+
         this.init();
         this.draw();
     }
 
     init() {
-        this.pieces.push(ChessPieceFactory.createPiece("rook", "black", 1, 5));
-        // this.pieces.push(ChessPieceFactory.createPiece("king", "black", 1, 5));
-        // this.pieces.push(ChessPieceFactory.createPiece("king", "white", 1, 5));
+        this.pieces.push(
+            ChessPieceFactory.createPiece(
+                "rook",
+                "black",
+                0,
+                0,
+                this.boardSettings
+            )
+        );
+        this.pieces.push(
+            ChessPieceFactory.createPiece(
+                "king",
+                "black",
+                0,
+                4,
+                this.boardSettings
+            )
+        );
+        this.pieces.push(
+            ChessPieceFactory.createPiece(
+                "king",
+                "white",
+                7,
+                4,
+                this.boardSettings
+            )
+        );
     }
 
     draw() {
@@ -166,11 +209,9 @@ class Chessboard {
                 );
             }
         }
-
     }
 
     drawPieces() {
-        console.log("draw Pieces: ", this.pieces);
         let index = 0;
         for (const piece in this.pieces) {
             this.pieces[piece].draw();
@@ -184,8 +225,6 @@ class Chessboard {
     }
 
     getSquareName(row, col) {
-        // this.notifyObservers();
-
         if (col < 1 || row < 1) {
             console.log("out of range");
             return null;
@@ -230,7 +269,6 @@ class Chessboard {
         // console.log(this.getDebugData());
         // this.drawOnDisplay(this._debugData);
         this.notifyObservers();
-
     }
 }
 
@@ -305,7 +343,6 @@ class Debugger {
             `observers: ${observers.length}`,
         ];
     }
-
 }
 
 const chessboardw = new Chessboard();

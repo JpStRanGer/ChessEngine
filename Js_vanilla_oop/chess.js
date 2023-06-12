@@ -1,10 +1,58 @@
 let canvas = document.getElementById("chessboard");
 let context = canvas.getContext("2d");
 
-class ChessPiece {
-    constructor() {}
+// Chess Piece Factory
+class ChessPieceFactory {
+    /**
+     * Creates a chess piece based on the provided type, color, row, and column.
+     * @param {string} type - The type of the chess piece (e.g., "rook", "knight").
+     * @param {string} color - The color of the chess piece ("black" or "white").
+     * @param {number} row - The row of the chess piece on the chessboard.
+     * @param {number} col - The column of the chess piece on the chessboard.
+     * @returns {ChessPiece} - The created chess piece.
+     */
+    static createPiece(type, color, row, col) {
+        switch (type) {
+            case "rook":
+                return new Rook(color, row, col);
+            case "king":
+                return new King(color, row, col);
+        }
+        // Add more piece types as needed
+    }
+}
 
-    drawPieseOnBoard() {}
+class ChessPiece {
+    constructor(color, row, col) {
+        this._Position = {
+            current: { col: col, row: row },
+        };
+        this._color = color;
+        this._type = "";
+        this.draw();
+    }
+
+    draw() {
+        console.log(`Drawing ${this.type}`);
+        context.fillStyle = "red";
+        context.font = "BOLD 50px";
+        context.fillText("PIECE", 50, 50);
+    }
+}
+
+class Rook extends ChessPiece {
+    constructor(color, row, col) {
+        // super(color, row, col);
+        super();
+        this._type = "rook";
+    }
+}
+
+class King extends ChessPiece {
+    constructor(color, row, col) {
+        super(color, row, col);
+        this._type = "king";
+    }
 }
 
 class Chessboard {
@@ -14,7 +62,8 @@ class Chessboard {
         this.boardSize = 8;
         this.squareColor = ["#7a8285", "#222"];
         this.boardIndex = {
-            horizontal: ["a", "b", "c", "d", "e", "f", "h", "g"],
+            // horizontal: ["a", "b", "c", "d", "e", "f", "h", "g"],
+            horizontal: ["A", "B", "C", "D", "E", "F", "H", "G"],
             vertical: ["1", "2", "3", "4", "5", "6", "7", "8"],
         };
         this.bordWidth = canvas.width - this.frameSize * 2;
@@ -22,9 +71,15 @@ class Chessboard {
         this.squareSize = this.bordWidth / this.boardSize;
 
         this.observers = [];
-        
-        
+        this.pieces = [];
+        this.init();
         this.draw();
+    }
+
+    init() {
+        this.pieces.push(ChessPieceFactory.createPiece("rook", "black", 1, 5));
+        this.pieces.push(ChessPieceFactory.createPiece("king", "black", 1, 5));
+        this.pieces.push(ChessPieceFactory.createPiece("king", "white", 1, 5));
     }
 
     draw() {
@@ -36,6 +91,7 @@ class Chessboard {
             this.frameSize,
             this.boardIndex
         );
+        this.drawPieces();
     }
 
     drawChessboard(boardSize, squareSize, frameSize, boardIndex) {
@@ -43,11 +99,12 @@ class Chessboard {
         let textOfset = 33;
 
         let collomnPos = frameSize + squareSize / 2;
-
+        let textColor = "black";
         for (var i = 0; i < boardSize; i++) {
             context.font = "bold 30px serif";
             context.textAlign = "center";
             context.textBaseline = "middle";
+            context.fillStyle = textColor;
             context.fillText(
                 boardIndex.horizontal[i],
                 collomnPos + i * squareSize,
@@ -86,6 +143,20 @@ class Chessboard {
         }
 
         this.notifyObservers();
+    }
+
+    drawPieces() {
+        console.log("draw Pieces: ", this.pieces);
+        let index = 0;
+        for (const piece in this.pieces) {
+            this.pieces[piece].draw();
+        }
+        // 
+        // or
+        // 
+        // for (const piece of this.pieces) {
+        //     piece.draw();
+        // }
     }
 
     getSquareName(row, col) {

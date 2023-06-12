@@ -1,28 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChessGame Js_vanilla_oop</title>
     <style>
-        body{
+        body {
             background: rgb(202, 196, 196);
         }
-        canvas{
+
+        canvas {
             display: block;
             /* display: inline-block; */
             margin: 5rem auto;
-            /* height: 40dvh; */
+            height: 40rem;
             /* aspect-ratio: 1; */
             /* width: 60dvw; */
             border: 1px solid #7a8285;
-            border-radius: 15px;
+            /* border-radius: 15px; */
+            resize: both;
+            overflow: auto;
+        }
+
+        .box {
+            height: 10rem;
+            width: 30rem;
+            background: rgb(114, 4, 4);
+            resize: both;
+            overflow: auto;
         }
     </style>
 </head>
+
 <body>
     <canvas id="chessboard" width="1000" height="1000"></canvas>
+    <!-- <div class="box">dfs</div> -->
     <script src="chess.js"></script>
 </body>
+
 </html>

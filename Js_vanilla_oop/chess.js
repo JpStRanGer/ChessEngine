@@ -36,20 +36,20 @@ class ChessPieceFactory {
 class ChessPiece {
     constructor(color, row, col, boardSettings) {
         this._boardSettings = boardSettings;
-        this._position = this.setBoardPosition(row, col);
+        this._position = this.setAbsoluteBoardPosition(row, col);
         this._color = color;
         this._type = "";
     }
 
-    setBoardPosition(row, col) {
+    setAbsoluteBoardPosition(absRow, absCol) {
         const frameSize = this._boardSettings.frameSize;
         const squareSize = this._boardSettings.squareSize;
         return {
             current: {
-                col: frameSize + col * squareSize + squareSize / 2,
-                row: frameSize + row * squareSize + squareSize / 2,
+                absCol: frameSize + absCol * squareSize + squareSize / 2,
+                absRow: frameSize + absRow * squareSize + squareSize / 2,
             },
-            old: { col: col, row: row },
+            old: { absCol: absCol, absRow: absRow },
         };
     }
 
@@ -65,12 +65,13 @@ class ChessPiece {
     }
 
     draw() {
-        context.fillStyle = "red";
-        context.font = "BOLD 100px";
+        console.log(`drawing pieceName at (${this._position.current.absCol},${this._position.current.absRow})`);
+        context.fillStyle = "blue";
+        context.font = "bold 20px serif";
         context.fillText(
             this._type,
-            this._position.current.col,
-            this._position.current.row
+            this._position.current.absCol,
+            this._position.current.absRow
         );
     }
 }
@@ -130,10 +131,10 @@ class boardSquare {
 class BoardSettings {
     constructor() {
         this.frameSize = 90;
-        this.boardSize = 8;
+        this.numberOfSquares = 8;
         this.bordWidth = canvas.width - this.frameSize * 2;
         this.bordHeight = this.bordWidth;
-        this.squareSize = this.bordWidth / this.boardSize;
+        this.squareSize = this.bordWidth / this.numberOfSquares;
         this.boardIndex = {
             horizontal: ["A", "B", "C", "D", "E", "F", "H", "G"],
             vertical: ["1", "2", "3", "4", "5", "6", "7", "8"],
@@ -150,7 +151,7 @@ class Chessboard {
         this.squareColor = this.boardSettings.squareColor;
         this.boardIndex = this.boardSettings.boardIndex;
         this.frameSize = this.boardSettings.frameSize;
-        this.boardSize = this.boardSettings.boardSize;
+        this.boardSize = this.boardSettings.numberOfSquares;
         this.bordWidth = this.boardSettings.bordWidth;
         this.bordHeight = this.boardSettings.bordHeight;
         this.squareSize = this.boardSettings.squareSize;
@@ -248,13 +249,13 @@ class Chessboard {
         this.drawPieces();
     }
 
-    drawChessboard(boardSize, squareSize, frameSize, boardIndex) {
+    drawChessboard(numberOfSquares, squareSize, frameSize, boardIndex) {
         // Draw frame
         let textOfset = 33;
 
         let collomnPos = frameSize + squareSize / 2;
         let textColor = "black";
-        for (var i = 0; i < boardSize; i++) {
+        for (var i = 0; i < numberOfSquares; i++) {
             context.font = "bold 30px serif";
             context.textAlign = "center";
             context.textBaseline = "middle";
@@ -281,8 +282,8 @@ class Chessboard {
             );
         }
         // Draw board
-        for (var row = 0; row < boardSize; row++) {
-            for (var col = 0; col < boardSize; col++) {
+        for (var row = 0; row < numberOfSquares; row++) {
+            for (var col = 0; col < numberOfSquares; col++) {
                 context.fillStyle =
                     (row + col) % 2 === 0
                         ? this.squareColor[0]
@@ -300,6 +301,7 @@ class Chessboard {
     drawPieces() {
         let index = 0;
         for (const piece in this.pieces) {
+            console.log("drawing piece ", this.pieces[piece]);
             this.pieces[piece].draw();
         }
         //
@@ -326,9 +328,16 @@ class Chessboard {
         //         this.boardIndex.vertical[8 - row]
         // );
         return (
-            this.boardIndex.horizontal[col - 1] +
+            this.boardIndex.horizontal[col - 1] + "  " +
             this.boardIndex.vertical[8 - row]
         );
+    }
+
+    getSquareNameFromAbsPos(absPosY, absPosX){
+        let col = Math.floor((absPosX - this.squareSize + this.squareSize/2) / this.squareSize);
+        let row = Math.floor((absPosY - this.squareSize + this.squareSize/2) / this.squareSize);;
+        return this.getSquareName(row, col);
+        // return `(${row}, ${col})`;
     }
 
     addObserver(observer) {
@@ -379,7 +388,7 @@ class Debugger {
     drawOnDisplay(debugData) {
         let fontSize = 20;
         let debugHeight = debugData.length * fontSize;
-        let debugWidth = 300;
+        let debugWidth = 200;
 
         // Draw debug window
         context.fillStyle = "gray";
@@ -409,12 +418,15 @@ class Debugger {
 
     getDebugData(data) {
         let boxPosition = canvas.getBoundingClientRect();
-        let boxX = this._chessboard._mouseX - boxPosition.left;
-        let boxY = this._chessboard._mouseY - boxPosition.top;
+        let mousePositionX = data.offsetX;
+        let mousePositionY = data.offsetY;
+        // let boxX = this._chessboard._mouseX - boxPosition.left;
+        // let boxY = this._chessboard._mouseY - boxPosition.top;
         let squareSize = this._chessboard.squareSize;
-        let row = Math.floor(boxY / squareSize);
-        let col = Math.floor(boxX / squareSize);
+        let row = Math.floor(mousePositionY / squareSize);
+        let col = Math.floor(mousePositionX / squareSize);
         let squareName = this._chessboard.getSquareName(row, col);
+        let absSquareName = this._chessboard.getSquareNameFromAbsPos(mousePositionY, mousePositionX);
         let observers = this._chessboard.observers;
 
         return [
@@ -424,11 +436,12 @@ class Debugger {
             `boxPosition.top: ${boxPosition.top}`,
             `clientX: ${this._chessboard._mouseX}`,
             `clientY: ${this._chessboard._mouseY}`,
-            `boxX: ${boxX}`,
-            `boxY: ${boxY}`,
+            `boxX: ${mousePositionX}`,
+            `boxY: ${mousePositionY}`,
             `data.offseX: ${data.offsetX}`,
             `data.offseY: ${data.offsetY}`,
             `Square: ${squareName}`,
+            `absSquare: ${absSquareName}`,
             `observers: ${observers.length}`,
         ];
     }
@@ -496,6 +509,6 @@ const chessboard = new Chessboard();
 const appDebugger = new Debugger(chessboard);
 
 const mousetracker = new mouseTracker();
-mousetracker.resizeCanvas();
+// mousetracker.resizeCanvas();
 
 // const userInteractionHandler = new UserInteractionHandler(chessboard);

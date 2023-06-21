@@ -36,20 +36,20 @@ class ChessPieceFactory {
 class ChessPiece {
     constructor(color, row, col, boardSettings) {
         this._boardSettings = boardSettings;
-        this._position = this.setAbsoluteBoardPosition(row, col);
+        this._position = this.setBoardPosition(row, col);
         this._color = color;
         this._type = "";
     }
 
-    setAbsoluteBoardPosition(absRow, absCol) {
+    setBoardPosition(row, col) {
         const frameSize = this._boardSettings.frameSize;
         const squareSize = this._boardSettings.squareSize;
         return {
             current: {
-                absCol: frameSize + absCol * squareSize + squareSize / 2,
-                absRow: frameSize + absRow * squareSize + squareSize / 2,
+                col: frameSize + col * squareSize + squareSize / 2,
+                row: frameSize + row * squareSize + squareSize / 2,
             },
-            old: { absCol: absCol, absRow: absRow },
+            old: { col: col, row: row },
         };
     }
 
@@ -65,13 +65,12 @@ class ChessPiece {
     }
 
     draw() {
-        console.log(`drawing pieceName at (${this._position.current.absCol},${this._position.current.absRow})`);
         context.fillStyle = "blue";
         context.font = "bold 20px serif";
         context.fillText(
             this._type,
-            this._position.current.absCol,
-            this._position.current.absRow
+            this._position.current.col,
+            this._position.current.row
         );
     }
 }

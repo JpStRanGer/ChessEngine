@@ -313,14 +313,14 @@ class Chessboard {
     }
 
     getSquareName(row, col) {
-        // if (col < 1 || row < 1) {
-        //     console.log("out of range");
-        //     return null;
-        // }
-        // if (col > 8 || row > 8) {
-        //     console.log("out of range");
-        //     return null;
-        // }
+        if (col < 1 || row < 1) {
+            // console.log("out of range");
+            return null;
+        }
+        if (col > 8 || row > 8) {
+            // console.log("out of range");
+            return null;
+        }
         // console.log(
         //     row - 1,
         //     col - 1,

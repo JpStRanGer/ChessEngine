@@ -6,22 +6,30 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChessGame Js_vanilla_oop</title>
+    <link rel="shortcut icon" href="#">
     <style>
         body {
             background: rgb(202, 196, 196);
         }
-
+        #canvas-container {
+            /* width: 400px; */
+            height: 40rem;
+            /* width: 40rem;*/
+            /* height: 40rem; */
+            aspect-ratio: 1; 
+            background-color: blue;
+        }
         canvas {
-            display: block;
+            /* display: block; */
             /* display: inline-block; */
-            margin: 5rem auto;
+            /* margin: 5rem auto; */
             /* height: 40rem; */
             /* aspect-ratio: 1; */
             /* width: 60dvw; */
             border: 1px solid #7a8285;
             /* border-radius: 15px; */
-            resize: both;
-            overflow: auto;
+            /* resize: both; */
+            /* overflow: auto; */
         }
 
         .box {
@@ -35,8 +43,12 @@
 </head>
 
 <body>
-    <canvas id="chessboard" width="1000" height="1000"></canvas>
-    <!-- <div class="box">dfs</div> -->
+    <div ID="canvas-container">
+
+        <canvas id="chessboard" width="700" height="700"></canvas>
+        <!-- <canvas id="chessboard"></canvas> -->
+        <!-- <div class="box">dfs</div> -->
+    </div>
     <script src="chess.js"></script>
 </body>
 

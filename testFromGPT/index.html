@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Canvas Line Drawing</title>
+    <style>
+        #canvas {
+            border: 1px solid #000;
+            cursor: crosshair;
+        }
+
+        #canvas-container {
+            /* width: 800rem; */
+            height: 30rem;
+            aspect-ratio: 1;
+            /* width: 500px;
+            height: 500px; */
+        }
+
+        #coordinates {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <canvas id="canvas"></canvas>
+    </div>
+    <div id="coordinates"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvasContainer = document.getElementById('canvas-container');
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const coordinatesDiv = document.getElementById('coordinates');
+
+            let isDrawing = false;
+            let prevX = 0;
+            let prevY = 0;
+
+            canvasContainer.addEventListener('mousedown', startDrawing);
+            canvasContainer.addEventListener('mousemove', drawLine);
+            canvasContainer.addEventListener('mouseup', stopDrawing);
+            canvasContainer.addEventListener('mouseout', stopDrawing);
+
+            resizeCanvas();
+
+            function resizeCanvas() {
+                canvas.width = canvasContainer.clientWidth;
+                canvas.height = canvasContainer.clientHeight;
+            }
+
+            window.addEventListener('resize', resizeCanvas);
+
+            function startDrawing(e) {
+                isDrawing = true;
+                [prevX, prevY] = [e.offsetX, e.offsetY];
+            }
+
+            function drawLine(e) {
+                if (!isDrawing) return;
+                ctx.beginPath();
+                ctx.moveTo(prevX, prevY);
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.stroke();
+                [prevX, prevY] = [e.offsetX, e.offsetY];
+                displayCoordinates(e.offsetX, e.offsetY);
+            }
+
+            function stopDrawing() {
+                isDrawing = false;
+            }
+
+            function displayCoordinates(x, y) {
+                coordinatesDiv.textContent = `Coordinates: (${x}, ${y})`;
+            }
+        });
+    </script>
+</body>
+</html>

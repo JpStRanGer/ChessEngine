@@ -1,5 +1,8 @@
 let canvas = document.getElementById("chessboard");
 let context = canvas.getContext("2d");
+let canvasContainer = document.getElementById("canvas-container");
+canvas.width = canvasContainer.clientWidth;
+canvas.height = canvasContainer.clientHeight;
 
 // Chess Piece Factory
 class ChessPieceFactory {
@@ -308,20 +311,20 @@ class Chessboard {
     }
 
     getSquareName(row, col) {
-        if (col < 1 || row < 1) {
-            console.log("out of range");
-            return null;
-        }
-        if (col > 8 || row > 8) {
-            console.log("out of range");
-            return null;
-        }
-        console.log(
-            row - 1,
-            col - 1,
-            this.boardIndex.horizontal[col - 1] +
-                this.boardIndex.vertical[8 - row]
-        );
+        // if (col < 1 || row < 1) {
+        //     console.log("out of range");
+        //     return null;
+        // }
+        // if (col > 8 || row > 8) {
+        //     console.log("out of range");
+        //     return null;
+        // }
+        // console.log(
+        //     row - 1,
+        //     col - 1,
+        //     this.boardIndex.horizontal[col - 1] +
+        //         this.boardIndex.vertical[8 - row]
+        // );
         return (
             this.boardIndex.horizontal[col - 1] +
             this.boardIndex.vertical[8 - row]
@@ -339,9 +342,10 @@ class Chessboard {
         }
     }
 
-    notifyObservers() {
+    notifyObservers(data) {
         for (const observer of this.observers) {
-            observer.update();
+            const test = { offsetX: 53, offsetY: 99 };
+            observer.update(data);
         }
     }
 
@@ -351,7 +355,7 @@ class Chessboard {
         // this._debugData = this.getDebugData();
         // console.log(this.getDebugData());
         // this.drawOnDisplay(this._debugData);
-        this.notifyObservers();
+        this.notifyObservers(event);
     }
 }
 
@@ -366,9 +370,9 @@ class Debugger {
     }
 
     // Update when notifyid from subject (the observed object)
-    update() {
+    update(data) {
         // console.log("debuger notifide!!");
-        const debugData = this.getDebugData();
+        const debugData = this.getDebugData(data);
         this.drawOnDisplay(debugData);
     }
 
@@ -403,7 +407,7 @@ class Debugger {
         }
     }
 
-    getDebugData() {
+    getDebugData(data) {
         let boxPosition = canvas.getBoundingClientRect();
         let boxX = this._chessboard._mouseX - boxPosition.left;
         let boxY = this._chessboard._mouseY - boxPosition.top;
@@ -418,16 +422,80 @@ class Debugger {
             `canvas.height ${canvas.height}`,
             `boxPosition.left: ${boxPosition.left}`,
             `boxPosition.top: ${boxPosition.top}`,
-            `clientX: ${this._mouseX}`,
-            `clientY: ${this._mouseY}`,
+            `clientX: ${this._chessboard._mouseX}`,
+            `clientY: ${this._chessboard._mouseY}`,
             `boxX: ${boxX}`,
             `boxY: ${boxY}`,
+            `data.offseX: ${data.offsetX}`,
+            `data.offseY: ${data.offsetY}`,
             `Square: ${squareName}`,
             `observers: ${observers.length}`,
         ];
     }
 }
 
-const chessboardw = new Chessboard();
+class UserInteractionHandler {
+    constructor(chessboard) {
+        this._chessboard = chessboard;
+        canvas.addEventListener("mousemove", this.handleMouseMove.bind(this));
+    }
 
-const appDebugger = new Debugger(chessboardw);
+    handleMouseMove(event) {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.offsetX;
+        const y = event.offsetY;
+
+        // this._chessboard.draw();
+        context.fillStyle = "red";
+        context.fillRect(x, y - 30, 50, 200);
+        context.fillStyle = "yellow";
+        context.fillText(x, x, y - 10);
+        context.fillText(y, x, y + 10);
+    }
+}
+
+class mouseTracker {
+    constructor() {
+        canvasContainer.addEventListener("mousedown", this.startDrawing);
+        canvasContainer.addEventListener("mousemove", this.drawLine);
+        canvasContainer.addEventListener("mouseup", this.stopDrawing);
+        canvasContainer.addEventListener("mouseout", this.stopDrawing);
+        // window.addEventListener('resize', this.resizeCanvas);
+
+        this.isDrawing = false;
+        this.prevX = 0;
+        this.prevY = 0;
+    }
+
+    // resizeCanvas() {
+    //     canvas.width = canvasContainer.clientWidth;
+    //     canvas.height = canvasContainer.clientHeight;
+    // }
+
+    startDrawing(e) {
+        this.isDrawing = true;
+        [this.prevX, this.prevY] = [e.offsetX, e.offsetY];
+    }
+
+    drawLine(e) {
+        if (!this.isDrawing) return;
+        context.beginPath();
+        context.moveTo(this.prevX, this.prevY);
+        context.lineTo(e.offsetX, e.offsetY);
+        context.stroke();
+        [this.prevX, this.prevY] = [e.offsetX, e.offsetY];
+    }
+
+    stopDrawing() {
+        this.isDrawing = false;
+    }
+}
+
+const chessboard = new Chessboard();
+
+const appDebugger = new Debugger(chessboard);
+
+const mousetracker = new mouseTracker();
+mousetracker.resizeCanvas();
+
+// const userInteractionHandler = new UserInteractionHandler(chessboard);

@@ -332,11 +332,20 @@ class Chessboard {
         );
     }
 
-    getSquareNameFromAbsPos(absPosY, absPosX){
-        let col = Math.floor((absPosX - this.squareSize + this.squareSize/2) / this.squareSize);
-        let row = Math.floor((absPosY - this.squareSize + this.squareSize/2) / this.squareSize);;
+    getSquareNameFromAbsPos(absPosY, absPosX) {
+        let col = this.scaleAbsPosToBordPos(absPosX);
+        let row = this.scaleAbsPosToBordPos(absPosY);
         return this.getSquareName(row, col);
-        // return `(${row}, ${col})`;
+    }
+
+    scaleAbsPosToBordPos(Pos) {
+        let x_max = this.frameSize + this.boardSize * this.squareSize;
+        let x_min = this.frameSize;
+        let y_max = 9;
+        let y_min = 1;
+        let y = ((y_max - y_min) / (x_max - x_min)) * (Pos - x_min) + y_min;
+        // return y;
+        return Math.floor(y);
     }
 
     addObserver(observer) {
@@ -383,7 +392,7 @@ class Debugger {
         const debugData = this.getDebugData(data);
         this.drawOnDisplay(debugData);
     }
-
+    
     drawOnDisplay(debugData) {
         let fontSize = 20;
         let debugHeight = debugData.length * fontSize;
@@ -419,28 +428,26 @@ class Debugger {
         let boxPosition = canvas.getBoundingClientRect();
         let mousePositionX = data.offsetX;
         let mousePositionY = data.offsetY;
-        // let boxX = this._chessboard._mouseX - boxPosition.left;
-        // let boxY = this._chessboard._mouseY - boxPosition.top;
         let squareSize = this._chessboard.squareSize;
-        let row = Math.floor(mousePositionY / squareSize);
-        let col = Math.floor(mousePositionX / squareSize);
-        let squareName = this._chessboard.getSquareName(row, col);
-        let absSquareName = this._chessboard.getSquareNameFromAbsPos(mousePositionY, mousePositionX);
+        let absSquareName = this._chessboard.getSquareNameFromAbsPos(
+            mousePositionY,
+            mousePositionX
+        );
         let observers = this._chessboard.observers;
 
         return [
             `canvas.width ${canvas.width}`,
             `canvas.height ${canvas.height}`,
+            `squareSize ${squareSize}`,
             `boxPosition.left: ${boxPosition.left}`,
             `boxPosition.top: ${boxPosition.top}`,
+            `boxPosition.right: ${boxPosition.right}`,
+            `boxPosition.bottom: ${boxPosition.bottom}`,
             `clientX: ${this._chessboard._mouseX}`,
             `clientY: ${this._chessboard._mouseY}`,
-            `boxX: ${mousePositionX}`,
-            `boxY: ${mousePositionY}`,
             `data.offseX: ${data.offsetX}`,
             `data.offseY: ${data.offsetY}`,
-            `Square: ${squareName}`,
-            `absSquare: ${absSquareName}`,
+            `SquareName: ${absSquareName}`,
             `observers: ${observers.length}`,
         ];
     }
@@ -466,48 +473,9 @@ class UserInteractionHandler {
     }
 }
 
-class mouseTracker {
-    constructor() {
-        canvasContainer.addEventListener("mousedown", this.startDrawing);
-        canvasContainer.addEventListener("mousemove", this.drawLine);
-        canvasContainer.addEventListener("mouseup", this.stopDrawing);
-        canvasContainer.addEventListener("mouseout", this.stopDrawing);
-        // window.addEventListener('resize', this.resizeCanvas);
-
-        this.isDrawing = false;
-        this.prevX = 0;
-        this.prevY = 0;
-    }
-
-    // resizeCanvas() {
-    //     canvas.width = canvasContainer.clientWidth;
-    //     canvas.height = canvasContainer.clientHeight;
-    // }
-
-    startDrawing(e) {
-        this.isDrawing = true;
-        [this.prevX, this.prevY] = [e.offsetX, e.offsetY];
-    }
-
-    drawLine(e) {
-        if (!this.isDrawing) return;
-        context.beginPath();
-        context.moveTo(this.prevX, this.prevY);
-        context.lineTo(e.offsetX, e.offsetY);
-        context.stroke();
-        [this.prevX, this.prevY] = [e.offsetX, e.offsetY];
-    }
-
-    stopDrawing() {
-        this.isDrawing = false;
-    }
-}
 
 const chessboard = new Chessboard();
 
 const appDebugger = new Debugger(chessboard);
-
-const mousetracker = new mouseTracker();
-// mousetracker.resizeCanvas();
 
 // const userInteractionHandler = new UserInteractionHandler(chessboard);

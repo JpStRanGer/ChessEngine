@@ -43,11 +43,12 @@ class ChessPiece {
     }
 
     setPieceStyle() {
-        let blackPieceColor = "yellow"
-        let whitePieceColor = "red"
-        let blackBackgroundColor = "yellow"
-        let whiteBackgroundColor = "red"
-        this._pieceColor = this._color === "white" ? blackPieceColor : whitePieceColor;
+        let blackPieceColor = "yellow";
+        let whitePieceColor = "red";
+        let blackBackgroundColor = "yellow";
+        let whiteBackgroundColor = "red";
+        this._pieceColor =
+            this._color === "white" ? blackPieceColor : whitePieceColor;
     }
 
     setBoardPosition(row, col) {
@@ -75,7 +76,6 @@ class ChessPiece {
 
     draw() {
         context.fillStyle = this._pieceColor;
-        console.log(this._pieceColor);
         context.font = "bold 20px serif";
         context.fillText(
             this._type,
@@ -149,6 +149,7 @@ class BoardSettings {
             vertical: ["1", "2", "3", "4", "5", "6", "7", "8"],
         };
         this.squareColor = ["#7a8285", "#222"];
+        this.backgroundColor = "lightgray";
     }
 }
 
@@ -241,7 +242,7 @@ class Chessboard {
             ChessPieceFactory.createPiece(
                 "bishop",
                 "white",
-                5,
+                6,
                 4,
                 this.boardSettings
             )
@@ -256,9 +257,14 @@ class Chessboard {
             this.boardIndex
         );
         this.drawPieces();
+        // this.notifyObservers();
     }
 
     drawChessboard(numberOfSquares, squareSize, frameSize, boardIndex) {
+        // Draw background
+        context.fillStyle = this.boardSettings.backgroundColor;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+
         // Draw frame
         let textOfset = 33;
 
@@ -310,7 +316,6 @@ class Chessboard {
     drawPieces() {
         let index = 0;
         for (const piece in this.pieces) {
-            console.log("drawing piece ", this.pieces[piece]);
             this.pieces[piece].draw();
         }
         //
@@ -372,6 +377,7 @@ class Chessboard {
 
     notifyObservers(data) {
         for (const observer of this.observers) {
+            console.log("notify observer...");
             const test = { offsetX: 53, offsetY: 99 };
             observer.update(data);
         }
@@ -383,12 +389,14 @@ class Chessboard {
         // this._debugData = this.getDebugData();
         // console.log(this.getDebugData());
         // this.drawOnDisplay(this._debugData);
+        this.draw();
         this.notifyObservers(event);
     }
 }
 
 class Debugger {
     constructor(chessboard) {
+        this.debuggerDiv = document.getElementById("debugger-div");
         this._chessboard = chessboard;
         this.showDebugger = true;
         if (this.showDebugger) {
@@ -399,9 +407,11 @@ class Debugger {
 
     // Update when notifyid from subject (the observed object)
     update(data) {
-        // console.log("debuger notifide!!");
+        console.log("debuger notifide!!");
         const debugData = this.getDebugData(data);
         this.drawOnDisplay(debugData);
+        // this.printOnDIV(debugData);
+        this.formatText2(debugData);
     }
 
     drawOnDisplay(debugData) {
@@ -462,6 +472,50 @@ class Debugger {
             `observers: ${observers.length}`,
         ];
     }
+    printOnDIV(debugData) {
+        // const formattedText = debugData.join(`\n`);
+        // const formattedText = debugData.join(` - `);
+        const formattedText = debugData.join(`<br/>`);
+        console.log(debugData);
+        console.log(formattedText);
+        this.debuggerDiv.textContent = formattedText;
+    }
+
+    formatText(strings) {
+        // Create a new <p> element for each string
+        const paragraphs = strings.map((str) => `<p>${str}</p>`);
+
+        // Join the paragraphs with line breaks
+        const formattedText = paragraphs.join("\n");
+
+        // Get the reference to the <div> element
+        const divElement = document.getElementById("debugger-div");
+
+        // Set the formatted text as the content of the <div>
+        divElement.innerHTML = formattedText;
+    }
+
+    formatText2(strings) {
+        // Get the reference to the <div> element
+        const divElement = document.getElementById("debugger-div");
+
+        // Create a new <p> element for each string
+        const paragraphs = strings
+            .map((str) => {
+                const parts = str.split(/\s+/); // Split string by whitespace
+
+                // const parts = str.split(" "); // Split string by whitespace
+                const remainingText = parts.slice(0, -1).join(" "); // Get the text before the last word
+                const spanText = `<span>${parts.slice(-2).join(" ")}</span>`; // Wrap the last two words in <span> tags
+
+
+                return `${remainingText} ${spanText}<br>`; // Combine the remaining parts and the <span> tags
+            })
+            .join("\n");
+
+        // Set the formatted text as the content of the <div>
+        divElement.innerHTML = paragraphs;
+    }
 }
 
 class UserInteractionHandler {
@@ -477,10 +531,10 @@ class UserInteractionHandler {
 
         // this._chessboard.draw();
         context.fillStyle = "red";
-        context.fillRect(x, y - 30, 50, 200);
+        context.fillRect(x + 15, y - 15, 60, 50);
         context.fillStyle = "yellow";
-        context.fillText(x, x, y - 10);
-        context.fillText(y, x, y + 10);
+        context.fillText(`x-${x}`, x + 20, y - 10);
+        context.fillText(`y-${y}`, x + 20, y + 10);
     }
 }
 
@@ -488,4 +542,4 @@ const chessboard = new Chessboard();
 
 const appDebugger = new Debugger(chessboard);
 
-// const userInteractionHandler = new UserInteractionHandler(chessboard);
+const userInteractionHandler = new UserInteractionHandler(chessboard);

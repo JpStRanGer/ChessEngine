@@ -11,21 +11,23 @@
         body {
             background: rgb(202, 196, 196);
         }
+
         #canvas-container {
             display: block;
-            margin: 10rem auto;
+            margin: 10rem auto 0;
             /* width: 400px; */
             height: 45rem;
             /* width: 40rem;*/
             /* height: 40rem; */
-            aspect-ratio: 1; 
+            aspect-ratio: 1;
             /* background-color: blue; */
             border: 5px solid #101111;
         }
+
         canvas {
             /* cursor: crosshair; */
             cursor: pointer;
-            /* display: inline-block; */
+            display: inline-block;
             /* margin: 5rem auto; */
             /* height: 40rem; */
             /* aspect-ratio: 1; */
@@ -42,6 +44,34 @@
             resize: both;
             overflow: auto;
         }
+
+        #debugger-div{
+            display: table;
+            outline: rgb(133, 79, 79) solid 3px;
+            margin: 2rem auto;
+            padding: 1rem;
+
+            resize: both;
+            overflow: auto;
+
+        }
+
+        #debugger-div p{
+            line-height: 0;
+        }
+
+        #debugger-div span{
+            color: rgb(105, 64, 64);
+            font-family: Georgia, serif;
+            font-size: 25px;
+            letter-spacing: 2px;
+            word-spacing: 2px;
+            font-weight: 700;
+            text-decoration: none;
+            font-style: italic;
+            font-variant: normal;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 
@@ -51,8 +81,8 @@
         <canvas id="chessboard" width="700" height="700"></canvas>
         <!-- <canvas id="chessboard"></canvas> -->
         <!-- <div class="box">dfs</div> -->
+        <div id="debugger-div">Debug data</div>
     </div>
-    <div id="debugger-div"></div>
     <script src="chess.js"></script>
 </body>
 

@@ -39,6 +39,15 @@ class ChessPiece {
         this._position = this.setBoardPosition(row, col);
         this._color = color;
         this._type = "";
+        this.setPieceStyle();
+    }
+
+    setPieceStyle() {
+        let blackPieceColor = "yellow"
+        let whitePieceColor = "red"
+        let blackBackgroundColor = "yellow"
+        let whiteBackgroundColor = "red"
+        this._pieceColor = this._color === "white" ? blackPieceColor : whitePieceColor;
     }
 
     setBoardPosition(row, col) {
@@ -65,7 +74,8 @@ class ChessPiece {
     }
 
     draw() {
-        context.fillStyle = "blue";
+        context.fillStyle = this._pieceColor;
+        console.log(this._pieceColor);
         context.font = "bold 20px serif";
         context.fillText(
             this._type,
@@ -327,7 +337,8 @@ class Chessboard {
         //         this.boardIndex.vertical[8 - row]
         // );
         return (
-            this.boardIndex.horizontal[col - 1] + "  " +
+            this.boardIndex.horizontal[col - 1] +
+            "  " +
             this.boardIndex.vertical[8 - row]
         );
     }
@@ -392,7 +403,7 @@ class Debugger {
         const debugData = this.getDebugData(data);
         this.drawOnDisplay(debugData);
     }
-    
+
     drawOnDisplay(debugData) {
         let fontSize = 20;
         let debugHeight = debugData.length * fontSize;
@@ -472,7 +483,6 @@ class UserInteractionHandler {
         context.fillText(y, x, y + 10);
     }
 }
-
 
 const chessboard = new Chessboard();
 

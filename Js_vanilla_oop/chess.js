@@ -377,7 +377,7 @@ class Chessboard {
 
     notifyObservers(data) {
         for (const observer of this.observers) {
-            console.log("notify observer...");
+            // console.log("notify observer...");
             const test = { offsetX: 53, offsetY: 99 };
             observer.update(data);
         }
@@ -396,7 +396,7 @@ class Chessboard {
 
 class Debugger {
     constructor(chessboard) {
-        this.debuggerDiv = document.getElementById("debugger-div");
+        this.externalDebugDisplay = document.getElementById("debugger-div"); // Get the reference to the <div> element
         this._chessboard = chessboard;
         this.showDebugger = true;
         if (this.showDebugger) {
@@ -407,11 +407,11 @@ class Debugger {
 
     // Update when notifyid from subject (the observed object)
     update(data) {
-        console.log("debuger notifide!!");
+        // console.log("debuger notifide!!");
         const debugData = this.getDebugData(data);
-        this.drawOnDisplay(debugData);
-        // this.printOnDIV(debugData);
-        this.formatText2(debugData);
+        // this.drawOnDisplay(debugData);
+        this.printOnDIV(debugData);
+        // this.formatDebugText(debugData);
     }
 
     drawOnDisplay(debugData) {
@@ -457,9 +457,9 @@ class Debugger {
         let observers = this._chessboard.observers;
 
         return [
-            `canvas.width ${canvas.width}`,
-            `canvas.height ${canvas.height}`,
-            `squareSize ${squareSize}`,
+            `canvas.width: ${canvas.width}`,
+            `canvas.height: ${canvas.height}`,
+            `squareSize: ${squareSize}`,
             `boxPosition.left: ${boxPosition.left}`,
             `boxPosition.top: ${boxPosition.top}`,
             `boxPosition.right: ${boxPosition.right}`,
@@ -472,49 +472,35 @@ class Debugger {
             `observers: ${observers.length}`,
         ];
     }
+
     printOnDIV(debugData) {
-        // const formattedText = debugData.join(`\n`);
-        // const formattedText = debugData.join(` - `);
-        const formattedText = debugData.join(`<br/>`);
-        console.log(debugData);
-        console.log(formattedText);
-        this.debuggerDiv.textContent = formattedText;
+        // this.externalDebugDisplay.textContent = this.formatDebugText(debugData); // This method works, but without interpreting HTML tags or entities. It just prints the string as it is!
+        this.externalDebugDisplay.innerHTML = this.formatDebugText(debugData); // this 
     }
 
-    formatText(strings) {
-        // Create a new <p> element for each string
-        const paragraphs = strings.map((str) => `<p>${str}</p>`);
-
-        // Join the paragraphs with line breaks
-        const formattedText = paragraphs.join("\n");
-
-        // Get the reference to the <div> element
-        const divElement = document.getElementById("debugger-div");
-
-        // Set the formatted text as the content of the <div>
-        divElement.innerHTML = formattedText;
-    }
-
-    formatText2(strings) {
-        // Get the reference to the <div> element
-        const divElement = document.getElementById("debugger-div");
+    formatDebugText(strings) {
 
         // Create a new <p> element for each string
-        const paragraphs = strings
+        return strings
             .map((str) => {
-                const parts = str.split(/\s+/); // Split string by whitespace
 
-                // const parts = str.split(" "); // Split string by whitespace
-                const remainingText = parts.slice(0, -1).join(" "); // Get the text before the last word
-                const spanText = `<span>${parts.slice(-2).join(" ")}</span>`; // Wrap the last two words in <span> tags
+                const startIndex = str.lastIndexOf(":") +2;
+                const endIndex = str.length;
+                // const substring = str.substring(startIndex - 10, str.length);
+                const substring1 = str.slice(0, startIndex);
+                // const substring2 = str.slice(startIndex, str.length);
+                // const substring2 = str.substring(startIndex, str.length);
+                const substring2 = str.substr(startIndex, str.length);
 
+                const firstPart = substring1;
+                const lastPart = substring2;
 
-                return `${remainingText} ${spanText}<br>`; // Combine the remaining parts and the <span> tags
+                return `<span class="debug--text">${firstPart}</span> <span class="debug--value">${lastPart}</span> <br/>`;
             })
             .join("\n");
 
         // Set the formatted text as the content of the <div>
-        divElement.innerHTML = paragraphs;
+        this.externalDebugDisplay.innerHTML = paragraphs;
     }
 }
 
@@ -533,8 +519,8 @@ class UserInteractionHandler {
         context.fillStyle = "red";
         context.fillRect(x + 15, y - 15, 60, 50);
         context.fillStyle = "yellow";
-        context.fillText(`x-${x}`, x + 20, y - 10);
-        context.fillText(`y-${y}`, x + 20, y + 10);
+        context.fillText(`x-${x}`, x + 45, y - 5);
+        context.fillText(`y-${y}`, x + 45, y + 15);
     }
 }
 

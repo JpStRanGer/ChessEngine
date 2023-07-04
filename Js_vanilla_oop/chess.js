@@ -39,7 +39,18 @@ class ChessPiece {
         this._position = this.setBoardPosition(row, col);
         this._color = color;
         this._type = "";
+        this._selected = false;
         this.setPieceStyle();
+    }
+
+    // Getter for checking if piece is selected
+    get selected(){
+        return this._selected;
+    }
+
+    // Setter for selecting if piece is selected
+    set selected(value){
+        this._selected = value;
     }
 
     setPieceStyle() {
@@ -507,11 +518,12 @@ class Debugger {
 class UserInteractionHandler {
     constructor(chessboard) {
         this._chessboard = chessboard;
+        
         canvas.addEventListener("mousemove", this.handleMouseMove.bind(this));
+        canvas.addEventListener("mousedown", this.handleMouseDown.bind(this));
     }
 
     handleMouseMove(event) {
-        const rect = canvas.getBoundingClientRect();
         const x = event.offsetX;
         const y = event.offsetY;
 
@@ -521,6 +533,10 @@ class UserInteractionHandler {
         context.fillStyle = "yellow";
         context.fillText(`x-${x}`, x + 45, y - 5);
         context.fillText(`y-${y}`, x + 45, y + 15);
+    }
+
+    handleMouseDown(event){
+
     }
 }
 

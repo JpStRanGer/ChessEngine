@@ -39,8 +39,9 @@ class PiecePosition{
         this.currentPos = {
             absRow: null,
             absCol: null,
+            relRow: null,
             relCol: null,
-            posName: null,
+            posNameString: null,
 
         }
         this.oldPositions ={}
@@ -49,6 +50,7 @@ class PiecePosition{
 class ChessPiece {
     constructor(color, row, col, boardSettings) {
         this._boardSettings = boardSettings;
+        // this._position = new PiecePosition(row, col); // TODO: change funtionality for using Possition class
         this._position = this.setBoardPosition(row, col);
         this._color = color;
         this._type = "";

@@ -33,6 +33,19 @@ class ChessPieceFactory {
     }
 }
 
+
+class PiecePosition{
+    constructor(){
+        this.currentPos = {
+            absRow: null,
+            absCol: null,
+            relCol: null,
+            posName: null,
+
+        }
+        this.oldPositions ={}
+    }
+}
 class ChessPiece {
     constructor(color, row, col, boardSettings) {
         this._boardSettings = boardSettings;

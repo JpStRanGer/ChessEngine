@@ -48,8 +48,8 @@ class PiecePosition{
     }
 }
 class ChessPiece {
-    constructor(color, row, col, boardSettings) {
-        this._boardSettings = boardSettings;
+    constructor(color, row, col, chessboard) {
+        this.chessboard = chessboard;
         // this._position = new PiecePosition(row, col); // TODO: change funtionality for using Possition class
         this._position = this.setBoardPosition(row, col);
         this._color = color;
@@ -78,8 +78,8 @@ class ChessPiece {
     }
 
     setBoardPosition(row, col) {
-        const frameSize = this._boardSettings.frameSize;
-        const squareSize = this._boardSettings.squareSize;
+        const frameSize = this.chessboard.boardSettings.frameSize;
+        const squareSize = this.chessboard.boardSettings.squareSize;
         return {
             current: {
                 col: frameSize + col * squareSize + squareSize / 2,
@@ -184,8 +184,8 @@ class Chessboard {
         canvas.addEventListener("mousemove", this.mouseTracker.bind(this));
 
         this.boardSettings = new BoardSettings();
-        this.squareColor = this.boardSettings.squareColor;
-        this.boardIndex = this.boardSettings.boardIndex;
+        // this.squareColor = this.boardSettings.squareColor;
+        // this.boardIndex = this.boardSettings.boardIndex;
         this.frameSize = this.boardSettings.frameSize;
         this.boardSize = this.boardSettings.numberOfSquares;
         this.bordWidth = this.boardSettings.bordWidth;
@@ -207,7 +207,7 @@ class Chessboard {
                 "black",
                 0,
                 0,
-                this.boardSettings
+                this
             )
         );
         this.pieces.push(
@@ -216,7 +216,7 @@ class Chessboard {
                 "black",
                 0,
                 1,
-                this.boardSettings
+                this
             )
         );
         this.pieces.push(
@@ -225,7 +225,7 @@ class Chessboard {
                 "black",
                 0,
                 2,
-                this.boardSettings
+                this
             )
         );
         this.pieces.push(
@@ -234,7 +234,7 @@ class Chessboard {
                 "black",
                 0,
                 3,
-                this.boardSettings
+                this
             )
         );
         this.pieces.push(
@@ -243,7 +243,7 @@ class Chessboard {
                 "black",
                 0,
                 4,
-                this.boardSettings
+                this
             )
         );
         this.pieces.push(
@@ -252,7 +252,7 @@ class Chessboard {
                 "black",
                 0,
                 5,
-                this.boardSettings
+                this
             )
         );
         this.pieces.push(
@@ -261,7 +261,7 @@ class Chessboard {
                 "white",
                 7,
                 4,
-                this.boardSettings
+                this
             )
         );
         this.pieces.push(
@@ -270,7 +270,7 @@ class Chessboard {
                 "white",
                 6,
                 4,
-                this.boardSettings
+                this
             )
         );
     }
@@ -286,7 +286,7 @@ class Chessboard {
         // this.notifyObservers();
     }
 
-    drawChessboard(numberOfSquares, squareSize, frameSize, boardIndex) {
+    drawChessboard(numberOfSquares, squareSize, frameSize) {
         // Draw background
         context.fillStyle = this.boardSettings.backgroundColor;
         context.fillRect(0, 0, canvas.width, canvas.height);
@@ -302,12 +302,12 @@ class Chessboard {
             context.textBaseline = "middle";
             context.fillStyle = textColor;
             context.fillText(
-                boardIndex.horizontal[i],
+                this.boardSettings.boardIndex.horizontal[i],
                 collomnPos + i * squareSize,
                 frameSize - textOfset
             );
             context.fillText(
-                boardIndex.horizontal[i],
+                this.boardSettings.boardIndex.horizontal[i],
                 collomnPos + i * squareSize,
                 frameSize + this.bordHeight + textOfset
             );
@@ -317,7 +317,7 @@ class Chessboard {
                 collomnPos + i * squareSize
             );
             context.fillText(
-                boardIndex.vertical[7 - i],
+                this.boardSettings.boardIndex.vertical[7 - i],
                 frameSize + this.bordHeight + textOfset,
                 collomnPos + i * squareSize
             );
@@ -327,8 +327,8 @@ class Chessboard {
             for (var col = 0; col < numberOfSquares; col++) {
                 context.fillStyle =
                     (row + col) % 2 === 0
-                        ? this.squareColor[0]
-                        : this.squareColor[1];
+                        ? this.boardSettings.squareColor[0]
+                        : this.boardSettings.squareColor[1];
                 context.fillRect(
                     frameSize + row * squareSize,
                     frameSize + col * squareSize,

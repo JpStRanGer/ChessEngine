@@ -368,9 +368,9 @@ class Chessboard {
         //         this.boardIndex.vertical[8 - row]
         // );
         return (
-            this.boardIndex.horizontal[col - 1] +
+            this.boardSettings.boardIndex.horizontal[col - 1] +
             "  " +
-            this.boardIndex.vertical[8 - row]
+            this.boardSettings.boardIndex.vertical[8 - row]
         );
     }
 

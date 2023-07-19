@@ -33,25 +33,42 @@ class ChessPieceFactory {
     }
 }
 
-
-class PiecePosition{
-    constructor(){
+class PiecePosition {
+    constructor(relCol, relRow, piece) {
         this.currentPos = {
-            absRow: null,
-            absCol: null,
-            relRow: null,
-            relCol: null,
-            posNameString: null,
+            absRow: piece.chessboard.frameSize + relRow * piece.chessboard.squareSize + piece.chessboard.squareSize / 2,
+            absCol: piece.chessboard.frameSize + relCol * piece.chessboard.squareSize + piece.chessboard.squareSize / 2,
+            relRow: relRow,
+            relCol: relCol,
+            posNameString: piece.chessboard.getSquareName(relRow, relCol),
+        };
+        this.oldPositions = {};
+        console.log(this.currentPos);
+    }
 
+    /**
+     * @param {string} value
+     */
+    set PositionString(value){
+        this.currentPos.posNameString = value;
+    }
+    
+    setPiecePosition_string(newPosition) {
+        const col = newPosition.charAt(0).toUpperCase();
+        const row = parseInt(newPosition.charAt(1));
+
+        if (isNaN(row) || row < 1 || row > 8 || column < "A" || column > "H") {
+            throw new Error("Invalid chess square");
         }
-        this.oldPositions ={}
+
+        return { col: col, row: row };
     }
 }
+
 class ChessPiece {
     constructor(color, row, col, chessboard) {
         this.chessboard = chessboard;
-        // this._position = new PiecePosition(row, col); // TODO: change funtionality for using Possition class
-        this._position = this.setBoardPosition(row, col);
+        this.piecePosition = new PiecePosition(col, row, this); // TODO: change funtionality for using Possition class
         this._color = color;
         this._type = "";
         this._selected = false;
@@ -59,12 +76,12 @@ class ChessPiece {
     }
 
     // Getter for checking if piece is selected
-    get selected(){
+    get selected() {
         return this._selected;
     }
 
     // Setter for selecting if piece is selected
-    set selected(value){
+    set selected(value) {
         this._selected = value;
     }
 
@@ -77,36 +94,14 @@ class ChessPiece {
             this._color === "white" ? blackPieceColor : whitePieceColor;
     }
 
-    setBoardPosition(row, col) {
-        const frameSize = this.chessboard.boardSettings.frameSize;
-        const squareSize = this.chessboard.boardSettings.squareSize;
-        return {
-            current: {
-                col: frameSize + col * squareSize + squareSize / 2,
-                row: frameSize + row * squareSize + squareSize / 2,
-            },
-            old: { col: col, row: row },
-        };
-    }
-
-    setPiecePosition_string(newPosition) {
-        const col = newPosition.charAt(0).toUpperCase();
-        const row = parseInt(newPosition.charAt(1));
-
-        if (isNaN(row) || row < 1 || row > 8 || column < "A" || column > "H") {
-            throw new Error("Invalid chess square");
-        }
-
-        return { col: col, row: row };
-    }
 
     draw() {
         context.fillStyle = this._pieceColor;
         context.font = "bold 20px serif";
         context.fillText(
             this._type,
-            this._position.current.col,
-            this._position.current.row
+            this.piecePosition.currentPos.absCol,
+            this.piecePosition.currentPos.absRow,
         );
     }
 }
@@ -184,8 +179,6 @@ class Chessboard {
         canvas.addEventListener("mousemove", this.mouseTracker.bind(this));
 
         this.boardSettings = new BoardSettings();
-        // this.squareColor = this.boardSettings.squareColor;
-        // this.boardIndex = this.boardSettings.boardIndex;
         this.frameSize = this.boardSettings.frameSize;
         this.boardSize = this.boardSettings.numberOfSquares;
         this.bordWidth = this.boardSettings.bordWidth;
@@ -202,76 +195,28 @@ class Chessboard {
 
     init() {
         this.pieces.push(
-            ChessPieceFactory.createPiece(
-                "rook",
-                "black",
-                0,
-                0,
-                this
-            )
+            ChessPieceFactory.createPiece("rook", "black", 0, 0, this)
         );
         this.pieces.push(
-            ChessPieceFactory.createPiece(
-                "knight",
-                "black",
-                0,
-                1,
-                this
-            )
+            ChessPieceFactory.createPiece("knight", "black", 0, 1, this)
         );
         this.pieces.push(
-            ChessPieceFactory.createPiece(
-                "bishop",
-                "black",
-                0,
-                2,
-                this
-            )
+            ChessPieceFactory.createPiece("bishop", "black", 0, 2, this)
         );
         this.pieces.push(
-            ChessPieceFactory.createPiece(
-                "queen",
-                "black",
-                0,
-                3,
-                this
-            )
+            ChessPieceFactory.createPiece("queen", "black", 0, 3, this)
         );
         this.pieces.push(
-            ChessPieceFactory.createPiece(
-                "king",
-                "black",
-                0,
-                4,
-                this
-            )
+            ChessPieceFactory.createPiece("king", "black", 0, 4, this)
         );
         this.pieces.push(
-            ChessPieceFactory.createPiece(
-                "bishop",
-                "black",
-                0,
-                5,
-                this
-            )
+            ChessPieceFactory.createPiece("bishop", "black", 0, 5, this)
         );
         this.pieces.push(
-            ChessPieceFactory.createPiece(
-                "king",
-                "white",
-                7,
-                4,
-                this
-            )
+            ChessPieceFactory.createPiece("king", "white", 7, 4, this)
         );
         this.pieces.push(
-            ChessPieceFactory.createPiece(
-                "bishop",
-                "white",
-                6,
-                4,
-                this
-            )
+            ChessPieceFactory.createPiece("bishop", "white", 6, 4, this)
         );
     }
 
@@ -501,16 +446,14 @@ class Debugger {
 
     printOnDIV(debugData) {
         // this.externalDebugDisplay.textContent = this.formatDebugText(debugData); // This method works, but without interpreting HTML tags or entities. It just prints the string as it is!
-        this.externalDebugDisplay.innerHTML = this.formatDebugText(debugData); // this 
+        this.externalDebugDisplay.innerHTML = this.formatDebugText(debugData); // this
     }
 
     formatDebugText(strings) {
-
         // Create a new <p> element for each string
         return strings
             .map((str) => {
-
-                const startIndex = str.lastIndexOf(":") +2;
+                const startIndex = str.lastIndexOf(":") + 2;
                 const endIndex = str.length;
                 // const substring = str.substring(startIndex - 10, str.length);
                 const substring1 = str.slice(0, startIndex);
@@ -533,7 +476,7 @@ class Debugger {
 class UserInteractionHandler {
     constructor(chessboard) {
         this._chessboard = chessboard;
-        
+
         canvas.addEventListener("mousemove", this.handleMouseMove.bind(this));
         canvas.addEventListener("mousedown", this.handleMouseDown.bind(this));
     }
@@ -550,9 +493,7 @@ class UserInteractionHandler {
         context.fillText(`y-${y}`, x + 45, y + 15);
     }
 
-    handleMouseDown(event){
-
-    }
+    handleMouseDown(event) {}
 }
 
 const chessboard = new Chessboard();

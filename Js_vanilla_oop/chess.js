@@ -36,23 +36,28 @@ class ChessPieceFactory {
 class PiecePosition {
     constructor(relCol, relRow, piece) {
         this.currentPos = {
-            absRow: piece.chessboard.frameSize + relRow * piece.chessboard.squareSize + piece.chessboard.squareSize / 2,
-            absCol: piece.chessboard.frameSize + relCol * piece.chessboard.squareSize + piece.chessboard.squareSize / 2,
+            absRow:
+                piece._chessboard.frameSize +
+                relRow * piece._chessboard.squareSize +
+                piece._chessboard.squareSize / 2,
+            absCol:
+                piece._chessboard.frameSize +
+                relCol * piece._chessboard.squareSize +
+                piece._chessboard.squareSize / 2,
             relRow: relRow,
             relCol: relCol,
-            posNameString: piece.chessboard.getSquareName(relRow, relCol),
+            posNameString: piece._chessboard.getSquareName(relRow, relCol),
         };
         this.oldPositions = {};
-        console.log(this.currentPos);
     }
 
     /**
      * @param {string} value
      */
-    set PositionString(value){
+    set PositionString(value) {
         this.currentPos.posNameString = value;
     }
-    
+
     setPiecePosition_string(newPosition) {
         const col = newPosition.charAt(0).toUpperCase();
         const row = parseInt(newPosition.charAt(1));
@@ -67,7 +72,7 @@ class PiecePosition {
 
 class ChessPiece {
     constructor(color, row, col, chessboard) {
-        this.chessboard = chessboard;
+        this._chessboard = chessboard;
         this.piecePosition = new PiecePosition(col, row, this); // TODO: change funtionality for using Possition class
         this._color = color;
         this._type = "";
@@ -94,14 +99,13 @@ class ChessPiece {
             this._color === "white" ? blackPieceColor : whitePieceColor;
     }
 
-
     draw() {
         context.fillStyle = this._pieceColor;
         context.font = "bold 20px serif";
         context.fillText(
             this._type,
             this.piecePosition.currentPos.absCol,
-            this.piecePosition.currentPos.absRow,
+            this.piecePosition.currentPos.absRow
         );
     }
 }
@@ -295,6 +299,24 @@ class Chessboard {
         // for (const piece of this.pieces) {
         //     piece.draw();
         // }
+    }
+
+    getPieceByAbsPos(absRow, absCol) {
+        this.test = null;
+    }
+
+    getPieceByRowCol(relRow, relCol) {
+        console.log(this.pieces);
+        for (const piece of this.pieces) {
+            if (
+                piece.piecePosition.currentPos.relRow === relRow &&
+                piece.piecePosition.currentPos.relCol === relCol
+            ) {
+                console.log(piece);
+                return piece;
+            }
+        }
+        return null;
     }
 
     getSquareName(row, col) {
@@ -491,6 +513,8 @@ class UserInteractionHandler {
         context.fillStyle = "yellow";
         context.fillText(`x-${x}`, x + 45, y - 5);
         context.fillText(`y-${y}`, x + 45, y + 15);
+
+        this._chessboard.getPieceByRowCol(1, 2);
     }
 
     handleMouseDown(event) {}

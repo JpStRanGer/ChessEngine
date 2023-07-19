@@ -511,8 +511,8 @@ class UserInteractionHandler {
     }
 
     handleMouseMove(event) {
-        const x = event.offsetX;
-        const y = event.offsetY;
+        this.x = event.offsetX;
+        this.y = event.offsetY;
 
         // this._chessboard.draw();
         // context.fillStyle = "red";
@@ -523,17 +523,19 @@ class UserInteractionHandler {
 
         // let row = this._chessboard.scaleAbsPosToBordPos(y);
         // let col = this._chessboard.scaleAbsPosToBordPos(x);
-        let [row, col] = this._chessboard.getSquareRelPosFromAbsPos(x,y)
+
+    }
+
+    handleMouseDown(event) {
+        let [row, col] = this._chessboard.getSquareRelPosFromAbsPos(this.x,this.y)
 
 
 
         console.log(
-            `col:${col}, row:${row}`
+            `col:${col}, row:${row}, board position: ${this._chessboard.getSquareName(row+1, col+1)}`
         );
         this._chessboard.getPieceByRelPos(row, col);
     }
-
-    handleMouseDown(event) {}
 }
 
 const chessboard = new Chessboard();

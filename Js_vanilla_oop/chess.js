@@ -305,8 +305,8 @@ class Chessboard {
         this.test = null;
     }
 
-    getPieceByRowCol(relRow, relCol) {
-        console.log(this.pieces);
+    getPieceByRelPos(relRow, relCol) {
+        // console.log(this.pieces);
         for (const piece of this.pieces) {
             if (
                 piece.piecePosition.currentPos.relRow === relRow &&
@@ -331,8 +331,8 @@ class Chessboard {
         // console.log(
         //     row - 1,
         //     col - 1,
-        //     this.boardIndex.horizontal[col - 1] +
-        //         this.boardIndex.vertical[8 - row]
+        // this.boardIndex.horizontal[col - 1] +
+        //     this.boardIndex.vertical[8 - row]
         // );
         return (
             this.boardSettings.boardIndex.horizontal[col - 1] +
@@ -345,6 +345,13 @@ class Chessboard {
         let col = this.scaleAbsPosToBordPos(absPosX);
         let row = this.scaleAbsPosToBordPos(absPosY);
         return this.getSquareName(row, col);
+    }
+
+    getSquareRelPosFromAbsPos(absPosY, absPosX) {
+        return [
+            this.scaleAbsPosToBordPos(absPosX)-1,
+            this.scaleAbsPosToBordPos(absPosY)-1,
+        ];
     }
 
     scaleAbsPosToBordPos(Pos) {
@@ -508,13 +515,22 @@ class UserInteractionHandler {
         const y = event.offsetY;
 
         // this._chessboard.draw();
-        context.fillStyle = "red";
-        context.fillRect(x + 15, y - 15, 60, 50);
-        context.fillStyle = "yellow";
-        context.fillText(`x-${x}`, x + 45, y - 5);
-        context.fillText(`y-${y}`, x + 45, y + 15);
+        // context.fillStyle = "red";
+        // context.fillRect(x + 15, y - 15, 60, 50);
+        // context.fillStyle = "yellow";
+        // context.fillText(`x-${x}`, x + 45, y - 5);
+        // context.fillText(`y-${y}`, x + 45, y + 15);
 
-        this._chessboard.getPieceByRowCol(1, 2);
+        // let row = this._chessboard.scaleAbsPosToBordPos(y);
+        // let col = this._chessboard.scaleAbsPosToBordPos(x);
+        let [row, col] = this._chessboard.getSquareRelPosFromAbsPos(x,y)
+
+
+
+        console.log(
+            `col:${col}, row:${row}`
+        );
+        this._chessboard.getPieceByRelPos(row, col);
     }
 
     handleMouseDown(event) {}

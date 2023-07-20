@@ -333,16 +333,12 @@ class Chessboard {
     }
 
     getSquareNameFromAbsPos(absPosY, absPosX) {
-        let col = this.scaleAbsPosToBordPos(absPosX);
-        let row = this.scaleAbsPosToBordPos(absPosY);
+        let [row, col] = this.scaleAbsPosToBordPos([absPosY, absPosX]);
         return this.getSquareNamefromRelPos(row, col);
     }
 
     getSquareRelPosFromAbsPos(absPosY, absPosX) {
-        return [
-            this.scaleAbsPosToBordPos(absPosY),
-            this.scaleAbsPosToBordPos(absPosX),
-        ];
+        return this.scaleAbsPosToBordPos([absPosY, absPosX]);
     }
 
     scaleAbsPosToBordPos(Pos) {
@@ -350,9 +346,8 @@ class Chessboard {
         let x_min = this.frameSize;
         let y_max = 8;
         let y_min = 0;
-        let y = ((y_max - y_min) / (x_max - x_min)) * (Pos - x_min) + y_min;
-        // return y;
-        return Math.floor(y);
+
+        return Pos.map((x) => Math.floor(((y_max - y_min) / (x_max - x_min)) * (x - x_min) + y_min));
     }
 
     addObserver(observer) {

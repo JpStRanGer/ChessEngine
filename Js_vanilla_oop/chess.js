@@ -395,9 +395,20 @@ class Debugger {
     update(data) {
         // console.log("debuger notifide!!");
         const debugData = this.getDebugData(data);
-        // this.drawOnDisplay(debugData);
+        this.drawOnDisplay(debugData);
         this.printOnDIV(debugData);
+        this.drawOnMouse(data);
         // this.formatDebugText(debugData);
+    }
+
+    drawOnMouse(data) {
+        this.x = data.offsetX;
+        this.y = data.offsetY;
+        context.fillStyle = "red";
+        context.fillRect(this.x + 20, this.y - 10, 60, 50);
+        context.fillStyle = "yellow";
+        context.fillText(`x-${this.x}`, this.x + 25, this.y - 10);
+        context.fillText(`y-${this.y}`, this.x + 25, this.y + 10);
     }
 
     drawOnDisplay(debugData) {
@@ -499,15 +510,9 @@ class UserInteractionHandler {
     }
 
     handleMouseMove(event) {
-        this.x = event.offsetX;
-        this.y = event.offsetY;
 
         // this._chessboard.draw();
-        // context.fillStyle = "red";
-        // context.fillRect(x + 15, y - 15, 60, 50);
-        // context.fillStyle = "yellow";
-        // context.fillText(`x-${x}`, x + 45, y - 5);
-        // context.fillText(`y-${y}`, x + 45, y + 15);
+
 
         // let row = this._chessboard.scaleAbsPosToBordPos(y);
         // let col = this._chessboard.scaleAbsPosToBordPos(x);

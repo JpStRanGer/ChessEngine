@@ -305,13 +305,13 @@ class Chessboard {
     }
 
     getPieceByRelPos(relRow, relCol) {
-        // console.log(this.pieces);
         for (const piece of this.pieces) {
             if (
+                // piece.piecePosition.currentPos.relRow === relCol &&
+                // piece.piecePosition.currentPos.relCol === relRow
                 piece.piecePosition.currentPos.relRow === relRow &&
                 piece.piecePosition.currentPos.relCol === relCol
             ) {
-                // console.log(piece);
                 return piece;
             }
         }
@@ -363,8 +363,6 @@ class Chessboard {
 
     notifyObservers(data) {
         for (const observer of this.observers) {
-            // console.log("notify observer...");
-            const test = { offsetX: 53, offsetY: 99 };
             observer.update(data);
         }
     }
@@ -372,9 +370,6 @@ class Chessboard {
     mouseTracker(event) {
         this._mouseX = event.clientX;
         this._mouseY = event.clientY;
-        // this._debugData = this.getDebugData();
-        // console.log(this.getDebugData());
-        // this.drawOnDisplay(this._debugData);
         this.draw();
         this.notifyObservers(event);
     }
@@ -393,11 +388,10 @@ class Debugger {
 
     // Update when notifyid from subject (the observed object)
     update(data) {
-        // console.log("debuger notifide!!");
         const debugData = this.getDebugData(data);
-        this.drawOnDisplay(debugData);
+        // this.drawOnDisplay(debugData);
         this.printOnDIV(debugData);
-        this.drawOnMouse(data);
+        // this.drawOnMouse(data);
         // this.formatDebugText(debugData);
     }
 
@@ -510,7 +504,8 @@ class UserInteractionHandler {
     }
 
     handleMouseMove(event) {
-
+        this.x = event.offsetX;
+        this.y = event.offsetY;
         // this._chessboard.draw();
 
 
@@ -519,28 +514,27 @@ class UserInteractionHandler {
     }
 
     handleMouseDown(event) {
+        console.log("Mouse down!");
         let [row, col] = this._chessboard.getSquareRelPosFromAbsPos(
-            this.x,
-            this.y
+            this.y,
+            this.x
         );
 
         this._selectedPiece = this._chessboard.getPieceByRelPos(row, col);
 
-        // console.log(
-        //     `col:${col}, row:${row}, board position: ${this._chessboard.getSquareNamefromRelPos(
-        //         row ,
-        //         col
-        //     )}`
-        // );
-        // console.log(this._selectedPiece);
+        console.log(
+            `col:${col}, row:${row}, board position: ${this._chessboard.getSquareNamefromRelPos(
+                row,
+                col
+            )}`
+        );
+        console.log(this._selectedPiece);
     }
 
     handleMouseUp(event) {
-        console.log("mouse up!")
+        console.log("Mouse up!");
         let pos = this._chessboard.getSquareRelPosFromAbsPos(this.y, this.x);
         let squarename = this._chessboard.getSquareNameFromAbsPos(this.y, this.x);
-        // console.log(this._selectedPiece.piecePosition.currentPos.absRow = this.y);
-        // console.log(this._selectedPiece.piecePosition.currentPos.absCol = this.x);
         console.log(`relative pos: ${pos}, squarename: ${squarename}`)
     }
 }

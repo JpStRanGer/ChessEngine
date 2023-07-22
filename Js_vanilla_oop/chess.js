@@ -33,15 +33,13 @@ class ChessPieceFactory {
     }
 }
 
+
 class PiecePosition {
     constructor(relCol, relRow, piece) {
+        let [absRow, absCol] = piece._chessboard.getAbsPosByRelPos([relRow, relCol])
         this.currentPos = {
-            absRow: piece._chessboard.frameSize +
-                relRow * piece._chessboard.squareSize +
-                piece._chessboard.squareSize / 2,
-            absCol: piece._chessboard.frameSize +
-                relCol * piece._chessboard.squareSize +
-                piece._chessboard.squareSize / 2,
+            absRow: absRow,
+            absCol: absCol,
             relRow: relRow,
             relCol: relCol,
             posNameString: piece._chessboard.getSquareNamefromRelPos(relRow, relCol),
@@ -339,6 +337,10 @@ class Chessboard {
 
     getSquareRelPosFromAbsPos(absPosY, absPosX) {
         return this.scaleAbsPosToBordPos([absPosY, absPosX]);
+    }
+
+    getAbsPosByRelPos(pos) {
+        return pos.map(x => this.frameSize + x * this.squareSize + this.squareSize / 2)
     }
 
     scaleAbsPosToBordPos(Pos) {

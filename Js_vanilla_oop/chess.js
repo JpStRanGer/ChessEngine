@@ -35,43 +35,66 @@ class ChessPieceFactory {
 
 
 class PiecePosition {
-    constructor(relCol, relRow, piece) {
-        let [absRow, absCol] = piece._chessboard.getAbsPosByRelPos([relRow, relCol])
-        this.currentPos = {
-            absRow: absRow,
-            absCol: absCol,
-            relRow: relRow,
-            relCol: relCol,
-            posNameString: piece._chessboard.getSquareNamefromRelPos(relRow, relCol),
-        };
-        this.oldPositions = {};
-    }
 
-    /**
-     * @param {string} value
-     */
-    set PositionString(value) {
-        this.currentPos.posNameString = value;
-    }
 
-    setPiecePosition_string(newPosition) {
-        const col = newPosition.charAt(0).toUpperCase();
-        const row = parseInt(newPosition.charAt(1));
+    _currentPos = {
+        absPos: undefined,
+        relPos: undefined,
+        absRow: undefined,
+        absCol: undefined,
+        relRow: undefined,
+        relCol: undefined,
+        posNameString: undefined,
+    };
+    oldPositions = {};
 
-        if (isNaN(row) || row < 1 || row > 8 || column < "A" || column > "H") {
-            throw new Error("Invalid chess square");
+    proxyHandler = {
+        get: (target, property, receiver) => {
+            return target[property]; // Just retrun the propertie value without anything else
+        },
+        set: (target, property, value, receiver) => {
+            switch (property) {
+                case "absPos":
+                    console.warn("this method/case is not tested!!")
+                    target[property] = value;
+                    target["relPos"] = this._piece._chessboard.getAbsPosByRelPos(value);
+                    [target["absRow"], target["absCol"]] = value;
+                    [target["relRow"], target["relCol"]] = target["relPos"];
+                    target["posNameString"] = this._piece._chessboard.getSquareNameFromAbsPos(...value);
+                    break;
+                case "relPos":
+                    target["absPos"] = this._piece._chessboard.getAbsPosByRelPos(value);
+                    target[property] = value;
+                    [target["absRow"], target["absCol"]] = this._piece._chessboard.getAbsPosByRelPos(value);
+                    [target["relRow"], target["relCol"]] = value;
+                    target["posNameString"] = this._piece._chessboard.getSquareNamefromRelPos(...value);
+                    break;
+
+                default:
+                    console.warn(`no maching case for ${property}`)
+            }
+            return true;
         }
+    };
 
-        return { col: col, row: row };
+    currentPos = new Proxy(this._currentPos, this.proxyHandler);
+
+    constructor(relRow, relCol, piece) {
+        this._piece = piece;
+        this.currentPos.relPos = [relRow, relCol];
+        // [this._currentPos.absRow, this._currentPos.absCol] = piece._chessboard.getAbsPosByRelPos([relRow, relCol])
+        // [this.currentPos.absRow, this.currentPos.absCol] = piece._chessboard.getAbsPosByRelPos([relRow, relCol])
     }
+
 }
 
 class ChessPiece {
     constructor(color, row, col, chessboard) {
         this._chessboard = chessboard;
-        this.piecePosition = new PiecePosition(col, row, this); // TODO: change funtionality for using Possition class
+        this.piecePosition = new PiecePosition(row, col, this); // TODO: change funtionality for using Possition class
         this._color = color;
-        this._type = "";
+        // this._type = undefined;
+        this._type = "jopnnas";
         this._selected = false;
         this.setPieceStyle();
     }
@@ -84,6 +107,11 @@ class ChessPiece {
     // Setter for selecting if piece is selected
     set selected(value) {
         this._selected = value;
+    }
+
+    // Getter for checking if piece is selected
+    get type() {
+        return this._type;
     }
 
     setPieceStyle() {
@@ -159,16 +187,16 @@ class boardSquare {
 }
 
 class BoardSettings {
+    boardIndex = {
+        horizontal: ["A", "B", "C", "D", "E", "F", "H", "G"],
+        vertical: ["1", "2", "3", "4", "5", "6", "7", "8"],
+    };
     constructor() {
         this.frameSize = 90;
         this.numberOfSquares = 8;
         this.bordWidth = canvas.width - this.frameSize * 2;
         this.bordHeight = this.bordWidth;
         this.squareSize = this.bordWidth / this.numberOfSquares;
-        this.boardIndex = {
-            horizontal: ["A", "B", "C", "D", "E", "F", "H", "G"],
-            vertical: ["1", "2", "3", "4", "5", "6", "7", "8"],
-        };
         this.squareColor = ["#7a8285", "#222"];
         this.backgroundColor = "lightgray";
     }
@@ -286,11 +314,11 @@ class Chessboard {
     }
 
     drawPieces() {
-        let index = 0;
-        for (const piece in this.pieces) {
-            this.pieces[piece].draw();
+        for (const index in this.pieces) {
+            this.pieces[index].draw();
         }
-        //
+        // The function above uses `in` to make indexes for each piece instead of 
+        // th function below that uses `of` to return the acctual piece.
         // or
         //
         // for (const piece of this.pieces) {
@@ -305,8 +333,6 @@ class Chessboard {
     getPieceByRelPos(relRow, relCol) {
         for (const piece of this.pieces) {
             if (
-                // piece.piecePosition.currentPos.relRow === relCol &&
-                // piece.piecePosition.currentPos.relCol === relRow
                 piece.piecePosition.currentPos.relRow === relRow &&
                 piece.piecePosition.currentPos.relCol === relCol
             ) {

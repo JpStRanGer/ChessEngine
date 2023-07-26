@@ -14,20 +14,20 @@ class ChessPieceFactory {
      * @param {number} col - The column of the chess piece on the chessboard.
      * @returns {ChessPiece} - The created chess piece.
      */
-    static createPiece(type, color, row, col, boardSettings) {
+    static createPiece(type, color, row, col, chessboard) {
         switch (type) {
             case "rook":
-                return new Rook(color, row, col, boardSettings);
+                return new Rook(color, row, col, chessboard);
             case "knight":
-                return new Knight(color, row, col, boardSettings);
+                return new Knight(color, row, col, chessboard);
             case "bishop":
-                return new Bishop(color, row, col, boardSettings);
+                return new Bishop(color, row, col, chessboard);
             case "queen":
-                return new Queen(color, row, col, boardSettings);
+                return new Queen(color, row, col, chessboard);
             case "king":
-                return new King(color, row, col, boardSettings);
+                return new King(color, row, col, chessboard);
             case "pawn":
-                return new Pawn(color, row, col, boardSettings);
+                return new Pawn(color, row, col, chessboard);
         }
         // Add more piece types as needed
     }
@@ -46,13 +46,19 @@ class PiecePosition {
         relCol: undefined,
         posNameString: undefined,
     };
-    oldPositions = {};
+    oldPositions = [];
 
     proxyHandler = {
         get: (target, property, receiver) => {
             return target[property]; // Just retrun the propertie value without anything else
         },
         set: (target, property, value, receiver) => {
+            // console.log("setting:", this._piece._type, ` property: ${property} to ${value}, ${this._piece._chessboard.getSquareNamefromRelPos(...value)}`, this._piece)
+
+            // Store a copy of the current position before making changes
+            // const oldPosCopy = {...target._currentPos };
+            // this.oldPositions.push(oldPosCopy);
+
             switch (property) {
                 case "absPos":
                     console.warn("this method/case is not tested!!")
@@ -82,21 +88,32 @@ class PiecePosition {
     constructor(relRow, relCol, piece) {
         this._piece = piece;
         this.currentPos.relPos = [relRow, relCol];
-        // [this._currentPos.absRow, this._currentPos.absCol] = piece._chessboard.getAbsPosByRelPos([relRow, relCol])
-        // [this.currentPos.absRow, this.currentPos.absCol] = piece._chessboard.getAbsPosByRelPos([relRow, relCol])
     }
 
 }
 
 class ChessPiece {
+    _type = undefined;
+    _chessboard = undefined;
+    _piecePosition = undefined;
+
     constructor(color, row, col, chessboard) {
         this._chessboard = chessboard;
         this.piecePosition = new PiecePosition(row, col, this); // TODO: change funtionality for using Possition class
         this._color = color;
-        // this._type = undefined;
-        this._type = "jopnnas";
         this._selected = false;
         this.setPieceStyle();
+    }
+
+    // Getter for selecting and release piece
+    get select() {
+        this._selected = true;
+        return this;
+    }
+
+    get release() {
+        this._selected = false;
+        return undefined;
     }
 
     // Getter for checking if piece is selected
@@ -138,6 +155,7 @@ class Rook extends ChessPiece {
     constructor(color, row, col, boardSettings) {
         super(color, row, col, boardSettings);
         this._type = "Rook";
+        this.piecePosition = new PiecePosition(row, col, this); // TODO: change funtionality for using Possition class
     }
 }
 
@@ -145,6 +163,7 @@ class Knight extends ChessPiece {
     constructor(color, row, col, boardSettings) {
         super(color, row, col, boardSettings);
         this._type = "Knight";
+        this.piecePosition = new PiecePosition(row, col, this); // TODO: change funtionality for using Possition class
     }
 }
 
@@ -152,6 +171,7 @@ class Bishop extends ChessPiece {
     constructor(color, row, col, boardSettings) {
         super(color, row, col, boardSettings);
         this._type = "Bishop";
+        this.piecePosition = new PiecePosition(row, col, this); // TODO: change funtionality for using Possition class
     }
 }
 
@@ -159,6 +179,7 @@ class Queen extends ChessPiece {
     constructor(color, row, col, boardSettings) {
         super(color, row, col, boardSettings);
         this._type = "Queen";
+        this.piecePosition = new PiecePosition(row, col, this); // TODO: change funtionality for using Possition class
     }
 }
 
@@ -166,12 +187,14 @@ class King extends ChessPiece {
     constructor(color, row, col, boardSettings) {
         super(color, row, col, boardSettings);
         this._type = "King";
+        this.piecePosition = new PiecePosition(row, col, this); // TODO: change funtionality for using Possition class
     }
 }
 class Pawn extends ChessPiece {
     constructor(color, row, col, boardSettings) {
         super(color, row, col, boardSettings);
         this._type = "Pawn";
+        this.piecePosition = new PiecePosition(row, col, this); // TODO: change funtionality for using Possition class
     }
 }
 
@@ -203,7 +226,7 @@ class BoardSettings {
 }
 
 class Chessboard {
-    _test = undefined;
+    // _test = undefined;
     constructor() {
         canvas.addEventListener("mousemove", this.mouseTracker.bind(this));
 
@@ -242,11 +265,45 @@ class Chessboard {
             ChessPieceFactory.createPiece("bishop", "black", 0, 5, this)
         );
         this.pieces.push(
+            ChessPieceFactory.createPiece("knight", "black", 0, 6, this)
+        );
+        this.pieces.push(
+            ChessPieceFactory.createPiece("rook", "black", 0, 7, this)
+        );
+        for (let i = 0; i < 8; i++) {
+            this.pieces.push(
+                ChessPieceFactory.createPiece("pawn", "black", 1, i, this)
+            )
+        }
+        this.pieces.push(
+            ChessPieceFactory.createPiece("rook", "white", 7, 0, this)
+        );
+        this.pieces.push(
+            ChessPieceFactory.createPiece("knight", "white", 7, 1, this)
+        );
+        this.pieces.push(
+            ChessPieceFactory.createPiece("bishop", "white", 7, 2, this)
+        );
+        this.pieces.push(
+            ChessPieceFactory.createPiece("queen", "white", 7, 3, this)
+        );
+        this.pieces.push(
             ChessPieceFactory.createPiece("king", "white", 7, 4, this)
         );
         this.pieces.push(
-            ChessPieceFactory.createPiece("bishop", "white", 6, 4, this)
+            ChessPieceFactory.createPiece("bishop", "white", 7, 5, this)
         );
+        this.pieces.push(
+            ChessPieceFactory.createPiece("knight", "white", 7, 6, this)
+        );
+        this.pieces.push(
+            ChessPieceFactory.createPiece("rook", "white", 7, 7, this)
+        );
+        for (let i = 0; i < 8; i++) {
+            this.pieces.push(
+                ChessPieceFactory.createPiece("pawn", "white", 6, i, this)
+            )
+        }
     }
 
     draw() {
@@ -336,7 +393,7 @@ class Chessboard {
                 piece.piecePosition.currentPos.relRow === relRow &&
                 piece.piecePosition.currentPos.relCol === relCol
             ) {
-                return piece;
+                return piece.select;
             }
         }
         return null;
@@ -351,7 +408,7 @@ class Chessboard {
         }
         return (
             this.boardSettings.boardIndex.horizontal[col] +
-            "  " +
+            // "  " +
             this.boardSettings.boardIndex.vertical[7 - row]
         );
     }
@@ -404,10 +461,11 @@ class Chessboard {
 }
 
 class Debugger {
+    externalDebugDisplay = document.getElementById("debugger-div"); // Get the reference to the <div> element
+    showDebugger = true;
+
     constructor(chessboard) {
-        this.externalDebugDisplay = document.getElementById("debugger-div"); // Get the reference to the <div> element
         this._chessboard = chessboard;
-        this.showDebugger = true;
         if (this.showDebugger) {
             this._chessboard.addObserver(this); // adding debugger as observer to chessboard.
             // this.drawOnDisplay();
@@ -534,36 +592,24 @@ class UserInteractionHandler {
     handleMouseMove(event) {
         this.x = event.offsetX;
         this.y = event.offsetY;
-        // this._chessboard.draw();
-
-
-        // let row = this._chessboard.scaleAbsPosToBordPos(y);
-        // let col = this._chessboard.scaleAbsPosToBordPos(x);
     }
 
     handleMouseDown(event) {
-        console.log("Mouse down!");
+        // console.log("Mouse down!");
         let [row, col] = this._chessboard.getSquareRelPosFromAbsPos(
             this.y,
             this.x
         );
 
         this._selectedPiece = this._chessboard.getPieceByRelPos(row, col);
-
-        console.log(
-            `col:${col}, row:${row}, board position: ${this._chessboard.getSquareNamefromRelPos(
-                row,
-                col
-            )}`
-        );
-        console.log(this._selectedPiece);
+        // console.log(this._selectedPiece)
     }
 
     handleMouseUp(event) {
         console.log("Mouse up!");
-        let pos = this._chessboard.getSquareRelPosFromAbsPos(this.y, this.x);
-        let squarename = this._chessboard.getSquareNameFromAbsPos(this.y, this.x);
-        console.log(`relative pos: ${pos}, squarename: ${squarename}`)
+        this._selectedPiece.piecePosition.currentPos.relPos = this._chessboard.scaleAbsPosToBordPos([this.y, this.x]);
+        this._selectedPiece.release;
+        console.log(this._selectedPiece)
     }
 }
 

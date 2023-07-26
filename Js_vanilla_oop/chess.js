@@ -62,13 +62,17 @@ class PiecePosition {
             switch (property) {
                 case "absPos":
                     console.warn("this method/case is not tested!!")
+                    console.log(target)
                     target[property] = value;
-                    target["relPos"] = this._piece._chessboard.getAbsPosByRelPos(value);
+                    target["relPos"] = this._piece._chessboard.scaleAbsPosToBordPos(value);
                     [target["absRow"], target["absCol"]] = value;
                     [target["relRow"], target["relCol"]] = target["relPos"];
+                    // [target["relRow"], target["relCol"]] = [5, 5];
                     target["posNameString"] = this._piece._chessboard.getSquareNameFromAbsPos(...value);
+                    console.log(target)
                     break;
                 case "relPos":
+                    console.warn(`setting relPos`)
                     target["absPos"] = this._piece._chessboard.getAbsPosByRelPos(value);
                     target[property] = value;
                     [target["absRow"], target["absCol"]] = this._piece._chessboard.getAbsPosByRelPos(value);
@@ -113,7 +117,7 @@ class ChessPiece {
 
     get release() {
         this._selected = false;
-        return undefined;
+        return null;
     }
 
     // Getter for checking if piece is selected
@@ -592,24 +596,29 @@ class UserInteractionHandler {
     handleMouseMove(event) {
         this.x = event.offsetX;
         this.y = event.offsetY;
+        if (this._selectedPiece === null) {
+            console.log("this._selectedPiece === null")
+        } else {
+            this._selectedPiece.piecePosition.currentPos.absPos = [this.y, this.x];
+
+
+        }
     }
 
     handleMouseDown(event) {
-        // console.log("Mouse down!");
+        console.log("Mouse down!");
         let [row, col] = this._chessboard.getSquareRelPosFromAbsPos(
             this.y,
             this.x
         );
 
         this._selectedPiece = this._chessboard.getPieceByRelPos(row, col);
-        // console.log(this._selectedPiece)
     }
 
     handleMouseUp(event) {
         console.log("Mouse up!");
         this._selectedPiece.piecePosition.currentPos.relPos = this._chessboard.scaleAbsPosToBordPos([this.y, this.x]);
-        this._selectedPiece.release;
-        console.log(this._selectedPiece)
+        this._selectedPiece = this._selectedPiece.release;
     }
 }
 

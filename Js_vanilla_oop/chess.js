@@ -4,6 +4,10 @@ let canvasContainer = document.getElementById("canvas-container");
 canvas.width = canvasContainer.clientWidth;
 canvas.height = canvasContainer.clientHeight;
 
+
+
+
+
 // Chess Piece Factory
 class ChessPieceFactory {
     /**
@@ -61,7 +65,7 @@ class PiecePosition {
 
             switch (property) {
                 case "absPos":
-                    console.warn("this method/case is not tested!!")
+                    // console.warn("this method/case is not tested!!")
                     console.log(target)
                     target[property] = value;
                     target["relPos"] = this._piece._chessboard.scaleAbsPosToBordPos(value);
@@ -142,9 +146,24 @@ class ChessPiece {
         let whiteBackgroundColor = "red";
         this._pieceColor =
             this._color === "white" ? blackPieceColor : whitePieceColor;
+        try {
+            this._pieceImage = new Image();
+            this._pieceImage.src = `path/to/image/${this._type}_${this._color}.png`;
+
+        } catch (err) {
+            console.error("JP-error", err)
+        }
     }
 
-    draw() {
+    drawWithImages() {
+        const absRow = this.piecePosition.currentPos.absRow;
+        const absCol = this.piecePosition.currentPos.absCol;
+
+        // Draw the piece image at the specified position
+        context.drawImage(this._pieceImage, absCol, absRow, this.boardSettings.squareSize, this.boardSettings.squareSize);
+
+    }
+    drawWithtext() {
         context.fillStyle = this._pieceColor;
         context.font = "bold 20px serif";
         context.fillText(
@@ -153,8 +172,10 @@ class ChessPiece {
             this.piecePosition.currentPos.absRow
         );
     }
+    draw() {
+        this.drawWithtext();
+    }
 }
-
 class Rook extends ChessPiece {
     constructor(color, row, col, boardSettings) {
         super(color, row, col, boardSettings);
@@ -212,7 +233,6 @@ class boardSquare {
         this._name = "";
     }
 }
-
 class BoardSettings {
     boardIndex = {
         horizontal: ["A", "B", "C", "D", "E", "F", "H", "G"],

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Chess Game</title>
+</head>
+
+<body>
+    <h1>Chess test from chatGPT</h1>
+    <h2><a
+            href="https://chat.openai.com/share/7c561813-5443-4a25-89b6-9e0109ac86f7">https://chat.openai.com/share/7c561813-5443-4a25-89b6-9e0109ac86f7</a>
+    </h2>
+    <canvas id="chessCanvas" width="480" height="480"></canvas>
+    <!-- <script src="your-script.js"> -->
+    <script>
+        class ImageLoader {
+            constructor(imageUrls, callback) {
+                this.images = [];
+                this.loadedCount = 0;
+
+                this.loadImages(imageUrls, callback);
+            }
+
+            loadImages(imageUrls, callback) {
+                for (let i = 0; i < imageUrls.length; i++) {
+                    const img = new Image();
+                    img.onload = () => this.imageLoaded(img, callback);
+                    img.src = imageUrls[i];
+                    this.images.push(img);
+                }
+            }
+
+            imageLoaded(image, callback) {
+                this.loadedCount++;
+                if (this.loadedCount === this.images.length) {
+                    callback(this.images);
+                }
+            }
+        }
+
+        class CanvasDrawer {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.context = this.canvas.getContext('2d');
+            }
+
+            clearCanvas() {
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+
+            drawImage(image, x, y) {
+                this.context.drawImage(image, x, y);
+            }
+        }
+
+        const imageUrls = ['bishopW3.png','bishopW3.png', 'bishopW3.png'];
+        const canvasDrawer = new CanvasDrawer('chessCanvas');
+
+        const imageLoader = new ImageLoader(imageUrls, (images) => {
+            canvasDrawer.clearCanvas();
+
+            for (let i = 0; i < images.length; i++) {
+                const x = i * 150; // Adjust the position of each image
+                canvasDrawer.drawImage(images[i], x, 0);
+            }
+        });
+    </script>
+</body>
+
+</html>

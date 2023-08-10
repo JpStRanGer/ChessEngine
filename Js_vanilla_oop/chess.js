@@ -4,12 +4,13 @@ let canvasContainer = document.getElementById("canvas-container");
 canvas.width = canvasContainer.clientWidth;
 canvas.height = canvasContainer.clientHeight;
 
-
-
-
-
 // Chess Piece Factory
 class ChessPieceFactory {
+    pieceName = [`bishop`];
+    pieceType = [``,`2`,`3`];
+    pieceColor = [`B`,`W`];
+    
+    constructor() {}
     /**
      * Creates a chess piece based on the provided type, color, row, and column.
      * @param {string} type - The type of the chess piece (e.g., "rook", "knight").
@@ -37,10 +38,7 @@ class ChessPieceFactory {
     }
 }
 
-
 class PiecePosition {
-
-
     _currentPos = {
         absPos: undefined,
         relPos: undefined,
@@ -66,29 +64,38 @@ class PiecePosition {
             switch (property) {
                 case "absPos":
                     // console.warn("this method/case is not tested!!")
-                    console.log(target)
+                    console.log(target);
                     target[property] = value;
-                    target["relPos"] = this._piece._chessboard.scaleAbsPosToBordPos(value);
+                    target["relPos"] =
+                        this._piece._chessboard.scaleAbsPosToBordPos(value);
                     [target["absRow"], target["absCol"]] = value;
                     [target["relRow"], target["relCol"]] = target["relPos"];
                     // [target["relRow"], target["relCol"]] = [5, 5];
-                    target["posNameString"] = this._piece._chessboard.getSquareNameFromAbsPos(...value);
-                    console.log(target)
+                    target["posNameString"] =
+                        this._piece._chessboard.getSquareNameFromAbsPos(
+                            ...value
+                        );
+                    console.log(target);
                     break;
                 case "relPos":
-                    console.warn(`setting relPos`)
-                    target["absPos"] = this._piece._chessboard.getAbsPosByRelPos(value);
+                    console.warn(`setting relPos`);
+                    target["absPos"] =
+                        this._piece._chessboard.getAbsPosByRelPos(value);
                     target[property] = value;
-                    [target["absRow"], target["absCol"]] = this._piece._chessboard.getAbsPosByRelPos(value);
+                    [target["absRow"], target["absCol"]] =
+                        this._piece._chessboard.getAbsPosByRelPos(value);
                     [target["relRow"], target["relCol"]] = value;
-                    target["posNameString"] = this._piece._chessboard.getSquareNamefromRelPos(...value);
+                    target["posNameString"] =
+                        this._piece._chessboard.getSquareNamefromRelPos(
+                            ...value
+                        );
                     break;
 
                 default:
-                    console.warn(`no maching case for ${property}`)
+                    console.warn(`no maching case for ${property}`);
             }
             return true;
-        }
+        },
     };
 
     currentPos = new Proxy(this._currentPos, this.proxyHandler);
@@ -97,13 +104,13 @@ class PiecePosition {
         this._piece = piece;
         this.currentPos.relPos = [relRow, relCol];
     }
-
 }
 
 class ChessPiece {
     _type = undefined;
     _chessboard = undefined;
     _piecePosition = undefined;
+    _pieceImage = undefined;
 
     constructor(color, row, col, chessboard) {
         this._chessboard = chessboard;
@@ -146,13 +153,6 @@ class ChessPiece {
         let whiteBackgroundColor = "red";
         this._pieceColor =
             this._color === "white" ? blackPieceColor : whitePieceColor;
-        try {
-            this._pieceImage = new Image();
-            this._pieceImage.src = `path/to/image/${this._type}_${this._color}.png`;
-
-        } catch (err) {
-            console.error("JP-error", err)
-        }
     }
 
     drawWithImages() {
@@ -160,8 +160,13 @@ class ChessPiece {
         const absCol = this.piecePosition.currentPos.absCol;
 
         // Draw the piece image at the specified position
-        context.drawImage(this._pieceImage, absCol, absRow, this.boardSettings.squareSize, this.boardSettings.squareSize);
-
+        context.drawImage(
+            this._pieceImage,
+            absCol,
+            absRow,
+            this.boardSettings.squareSize,
+            this.boardSettings.squareSize
+        );
     }
     drawWithtext() {
         context.fillStyle = this._pieceColor;
@@ -297,7 +302,7 @@ class Chessboard {
         for (let i = 0; i < 8; i++) {
             this.pieces.push(
                 ChessPieceFactory.createPiece("pawn", "black", 1, i, this)
-            )
+            );
         }
         this.pieces.push(
             ChessPieceFactory.createPiece("rook", "white", 7, 0, this)
@@ -326,7 +331,7 @@ class Chessboard {
         for (let i = 0; i < 8; i++) {
             this.pieces.push(
                 ChessPieceFactory.createPiece("pawn", "white", 6, i, this)
-            )
+            );
         }
     }
 
@@ -381,9 +386,9 @@ class Chessboard {
         for (var row = 0; row < numberOfSquares; row++) {
             for (var col = 0; col < numberOfSquares; col++) {
                 context.fillStyle =
-                    (row + col) % 2 === 0 ?
-                    this.boardSettings.squareColor[0] :
-                    this.boardSettings.squareColor[1];
+                    (row + col) % 2 === 0
+                        ? this.boardSettings.squareColor[0]
+                        : this.boardSettings.squareColor[1];
                 context.fillRect(
                     frameSize + row * squareSize,
                     frameSize + col * squareSize,
@@ -398,7 +403,7 @@ class Chessboard {
         for (const index in this.pieces) {
             this.pieces[index].draw();
         }
-        // The function above uses `in` to make indexes for each piece instead of 
+        // The function above uses `in` to make indexes for each piece instead of
         // th function below that uses `of` to return the acctual piece.
         // or
         //
@@ -447,7 +452,9 @@ class Chessboard {
     }
 
     getAbsPosByRelPos(pos) {
-        return pos.map(x => this.frameSize + x * this.squareSize + this.squareSize / 2)
+        return pos.map(
+            (x) => this.frameSize + x * this.squareSize + this.squareSize / 2
+        );
     }
 
     scaleAbsPosToBordPos(Pos) {
@@ -456,7 +463,11 @@ class Chessboard {
         let y_max = 8;
         let y_min = 0;
 
-        return Pos.map((x) => Math.floor(((y_max - y_min) / (x_max - x_min)) * (x - x_min) + y_min));
+        return Pos.map((x) =>
+            Math.floor(
+                ((y_max - y_min) / (x_max - x_min)) * (x - x_min) + y_min
+            )
+        );
     }
 
     addObserver(observer) {
@@ -617,11 +628,12 @@ class UserInteractionHandler {
         this.x = event.offsetX;
         this.y = event.offsetY;
         if (this._selectedPiece === null) {
-            console.log("this._selectedPiece === null")
+            console.log("this._selectedPiece === null");
         } else {
-            this._selectedPiece.piecePosition.currentPos.absPos = [this.y, this.x];
-
-
+            this._selectedPiece.piecePosition.currentPos.absPos = [
+                this.y,
+                this.x,
+            ];
         }
     }
 
@@ -637,7 +649,8 @@ class UserInteractionHandler {
 
     handleMouseUp(event) {
         console.log("Mouse up!");
-        this._selectedPiece.piecePosition.currentPos.relPos = this._chessboard.scaleAbsPosToBordPos([this.y, this.x]);
+        this._selectedPiece.piecePosition.currentPos.relPos =
+            this._chessboard.scaleAbsPosToBordPos([this.y, this.x]);
         this._selectedPiece = this._selectedPiece.release;
     }
 }
